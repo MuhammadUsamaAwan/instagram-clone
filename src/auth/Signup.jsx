@@ -1,6 +1,11 @@
 import { useState, useMemo, useEffect } from 'react'
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
-import { setDoc, doc, serverTimestamp } from 'firebase/firestore'
+import {
+  createUserWithEmailAndPassword,
+  updateProfile,
+  FacebookAuthProvider,
+  signInWithPopup,
+} from 'firebase/auth'
+import { setDoc, doc, getDoc, serverTimestamp } from 'firebase/firestore'
 import { auth, db } from '../config/firebase.config'
 import logo from '../assets/images/logo.png'
 import cross from '../assets/images/cross.png'
@@ -98,11 +103,29 @@ const Signup = () => {
     navigate('/')
   }
 
+  // login with facebook
+  const loginWithFacebook = async () => {
+    const provider = new FacebookAuthProvider()
+    const result = await signInWithPopup(auth, provider)
+    const user = result.user
+    const docRef = doc(db, 'users', user.uid)
+    const docSnap = await getDoc(docRef)
+    if (!docSnap.exists()) {
+      await setDoc(doc(db, 'users', user.uid), {
+        email: user.email,
+        name: user.displayName,
+        userName: user.displayName.replace(/ /g, ''),
+        timestamp: serverTimestamp(),
+        photoURL: user.photoURL,
+      })
+    }
+  }
+
   return (
     <div className='max-w-[21.875rem]'>
       {/* signup form */}
       <form
-        className='border border-gainsboro bg-white p-10 text-center flex flex-col items-center justify-center'
+        className='border-0 sm:border sm:border-gainsboro bg-current sm:bg-white p-10 text-center flex flex-col items-center justify-center'
         onSubmit={e => handleSubmit(e)}
       >
         {/* instagram logo */}
@@ -115,6 +138,7 @@ const Signup = () => {
         <button
           type='button'
           className='bg-vividcerulean flex items-center justify-center w-full my-2.5 py-[0.3125rem] rounded'
+          onClick={loginWithFacebook}
         >
           <Facebook width={22} height={22} />
           <span className='text-white font-semibold'>Log in with Facebook</span>
@@ -311,7 +335,7 @@ const Signup = () => {
       </form>
 
       {/* login instead */}
-      <div className='border border-gainsboro bg-white py-6 text-center flex items-center justify-center mt-2.5'>
+      <div className='border-0 sm:border border-gainsboro bg-current sm:bg-white py-6 text-center flex items-center justify-center mt-2.5'>
         <p>Have an account?</p>
         <Link to='/login' className='text-vividcerulean ml-1'>
           Log in

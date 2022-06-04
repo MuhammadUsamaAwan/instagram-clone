@@ -1,6 +1,11 @@
 import { useState, useMemo, useEffect } from 'react'
-import { signInWithEmailAndPassword } from 'firebase/auth'
-import { auth } from '../config/firebase.config'
+import {
+  signInWithEmailAndPassword,
+  FacebookAuthProvider,
+  signInWithPopup,
+} from 'firebase/auth'
+import { setDoc, doc, getDoc, serverTimestamp } from 'firebase/firestore'
+import { auth, db } from '../config/firebase.config'
 import logo from '../assets/images/logo.png'
 import appleStore from '../assets/images/app-store.png'
 import googlePlay from '../assets/images/google-play.png'
@@ -44,11 +49,29 @@ const Login = () => {
     navigate('/')
   }
 
+  // login with facebook
+  const loginWithFacebook = async () => {
+    const provider = new FacebookAuthProvider()
+    const result = await signInWithPopup(auth, provider)
+    const user = result.user
+    const docRef = doc(db, 'users', user.uid)
+    const docSnap = await getDoc(docRef)
+    if (!docSnap.exists()) {
+      await setDoc(doc(db, 'users', user.uid), {
+        email: user.email,
+        name: user.displayName,
+        userName: user.displayName.replace(/ /g, ''),
+        timestamp: serverTimestamp(),
+        photoURL: user.photoURL,
+      })
+    }
+  }
+
   return (
     <div className='max-w-[21.875rem]'>
       {/* signup form */}
       <form
-        className='border border-gainsboro bg-white p-10 pb-4 text-center flex flex-col items-center justify-center'
+        className='border-0 sm:border border-gainsboro bg-current sm:bg-white p-10 pb-4 text-center flex flex-col items-center justify-center'
         onSubmit={e => handleSubmit(e)}
       >
         {/* instagram logo */}
@@ -63,7 +86,7 @@ const Login = () => {
                 : '-translate-y-1/2 text-xs'
             } absolute text-philippinegray left-2 top-1/2 pointer-events-none z-10 transition-all duration-75 ease-linear`}
           >
-            Mobile Number or Email
+            Phone Number, username, or Email
           </label>
           <input
             value={email}
@@ -121,7 +144,10 @@ const Login = () => {
           <div className='bg-gainsboro h-[1px]'></div>
         </div>
         {/* login with facebook */}
-        <button className='flex items-center justify-center my-2.5'>
+        <button
+          className='flex items-center justify-center my-2.5'
+          onClick={loginWithFacebook}
+        >
           <img src={facebook} alt='facebook' />
           <p className='text-metallicblue font-semibold ml-1'>
             Log in with Facebook
@@ -131,13 +157,14 @@ const Login = () => {
         {/* submit error */}
         {submitError && <p className='text-desire my-1.5'>{submitError}</p>}
 
+        {/* forgot password */}
         <Link to='/forgotpassword' className='text-metallicblue text-xs mt-2.5'>
           Forgot Password?
         </Link>
       </form>
 
       {/* signup instead */}
-      <div className='border border-gainsboro bg-white py-6 text-center flex items-center justify-center mt-2.5'>
+      <div className='border-0 sm:border border-gainsboro bg-current sm:bg-white py-6 text-center flex items-center justify-center mt-2.5'>
         <p>Don't have an account?</p>
         <Link to='/signup' className='text-vividcerulean ml-1'>
           Sign up
