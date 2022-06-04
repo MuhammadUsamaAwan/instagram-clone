@@ -7,13 +7,15 @@ module.exports = {
       white: '#FFFFFF',
       lotion: '#FAFAFA',
       raisinblack: '#262626',
-      gainsboro: '#DCDCDC',
+      gainsboro: '#DBDBDB',
       vividcerulean: '#0095F6',
+      freshair: 'rgba(0,149,246,0.3)',
       brightgray: '#EFEFEF',
       desire: '#ED4956',
       chinesecilver: '#C7C7C7',
-      philippinegray: '8E8E8E',
+      philippinegray: '#8E8E8E',
       overlay: 'rgba(0,0,0,0.65)',
+      metallicblue: '#385185',
     },
     extend: {
       fontFamily: {
