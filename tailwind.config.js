@@ -16,6 +16,7 @@ module.exports = {
       philippinegray: '#8E8E8E',
       overlay: 'rgba(0,0,0,0.65)',
       metallicblue: '#385185',
+      transparent: 'transparent',
     },
     extend: {
       fontFamily: {

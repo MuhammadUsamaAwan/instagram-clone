@@ -17,7 +17,7 @@ const ForgotPassword = () => {
   useEffect(() => {
     if (email.match(emailRegex)) setAllowSubmit(true)
     else setAllowSubmit(false)
-  }, [email])
+  }, [email, emailRegex])
 
   // submit function
   const handleSubmit = async e => {

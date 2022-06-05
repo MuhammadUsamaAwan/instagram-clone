@@ -35,7 +35,7 @@ const Login = () => {
     if (email.match(emailRegex) && password.match(passwordRegex))
       setAllowSubmit(true)
     else setAllowSubmit(false)
-  }, [email, password])
+  }, [email, password, emailRegex, passwordRegex])
 
   // submit function
   const handleSubmit = async e => {
@@ -65,6 +65,7 @@ const Login = () => {
         photoURL: user.photoURL,
       })
     }
+    navigate('/')
   }
 
   return (
@@ -145,6 +146,7 @@ const Login = () => {
         </div>
         {/* login with facebook */}
         <button
+          type='button'
           className='flex items-center justify-center my-2.5'
           onClick={loginWithFacebook}
         >

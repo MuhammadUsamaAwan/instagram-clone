@@ -1,9 +1,14 @@
 import { Navigate, Outlet } from 'react-router-dom'
-import { auth } from '../config/firebase.config'
+import { useAuthStatus } from '../hooks/useAuthStatus'
+import LoadingScreen from '../layouts/LoadingScreen'
 import PublicFooter from '../layouts/PublicFooter'
 
 const PublicRoutes = () => {
-  return !auth.currentUser ? (
+  const { loggedIn, checkingStatus } = useAuthStatus()
+  if (checkingStatus) {
+    return <LoadingScreen />
+  }
+  return !loggedIn ? (
     <>
       <main className='grid place-content-center min-h-[93vh]'>
         <Outlet />

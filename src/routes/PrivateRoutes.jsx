@@ -1,8 +1,23 @@
 import { Navigate, Outlet } from 'react-router-dom'
-import { auth } from '../config/firebase.config'
+import { useAuthStatus } from '../hooks/useAuthStatus'
+import Header from '../layouts/Header'
+import LoadingScreen from '../layouts/LoadingScreen'
 
 const PrivateRoute = () => {
-  return auth.currentUser ? <Outlet /> : <Navigate to='/login' />
+  const { loggedIn, checkingStatus } = useAuthStatus()
+  if (checkingStatus) {
+    return <LoadingScreen />
+  }
+  return loggedIn ? (
+    <>
+      <Header />
+      <main className='pt-[3.75rem]'>
+        <Outlet />
+      </main>
+    </>
+  ) : (
+    <Navigate to='/login' />
+  )
 }
 
 export default PrivateRoute

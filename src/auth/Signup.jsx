@@ -68,7 +68,7 @@ const Signup = () => {
     )
       setAllowSubmit(true)
     else setAllowSubmit(false)
-  }, [email, name, userName, password])
+  }, [email, name, userName, password, emailRegex, passwordRegex])
 
   // submit function
   const handleSubmit = async e => {
@@ -119,6 +119,7 @@ const Signup = () => {
         photoURL: user.photoURL,
       })
     }
+    navigate('/')
   }
 
   return (
