@@ -5,6 +5,7 @@ import Signup from '../auth/Signup'
 import Login from '../auth/Login'
 import ForgotPassword from '../auth/ForgotPassword'
 import Home from '../pages/Home'
+import Profile from '../pages/Profile'
 
 const AppRoutes = () => {
   return (
@@ -17,6 +18,7 @@ const AppRoutes = () => {
         </Route>
         <Route element={<PrivateRoute />}>
           <Route path='/' element={<Home />} />
+          <Route path='/userprofile' element={<Profile />} />
         </Route>
       </Routes>
     </Router>

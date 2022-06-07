@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { auth, db } from '../config/firebase.config'
 import { collection, getDocs, query, where, limit } from 'firebase/firestore'
 import { useOutsideClick } from '../hooks/useOutsideClick'
+import { useDebounce } from '../hooks/useDebounce'
 import logo from '../assets/images/nav-logo.png'
 import clear from '../assets/images/clear.png'
 import avatar from '../assets/images/avatar.jpg'
@@ -49,28 +50,31 @@ const Header = () => {
     navigate('/login')
   }
 
-  const handleSearch = async e => {
-    setSearch(e.target.value)
-    const usersRef = collection(db, 'users')
-    const q = query(
-      usersRef,
-      where('userName', '>=', e.target.value),
-      limit(20)
-    )
-    const querySnap = await getDocs(q)
-    const users = []
-    querySnap.forEach(doc => {
-      return users.push({
-        id: doc.id,
-        data: doc.data(),
-      })
-    })
-    setSearchResults(users)
-  }
+  useDebounce(
+    async () => {
+      if (search) {
+        const usersRef = collection(db, 'users')
+        const q = query(usersRef, where('userName', '>=', search), limit(20))
+        const querySnap = await getDocs(q)
+        const users = []
+        querySnap.forEach(doc => {
+          return users.push({
+            id: doc.id,
+            data: doc.data(),
+          })
+        })
+        setSearchResults(users)
+      } else {
+        setSearchResults('')
+      }
+    },
+    500,
+    [search]
+  )
 
   return (
     <header className='grid place-content-center border-b border-gainsboro bg-white fixed w-full'>
-      <nav className='h-[3.75rem] flex items-center justify-between px-0 sm:px-5 w-screen md:w-[768px] xl:w-[975px]'>
+      <nav className='h-[3.75rem] flex items-center justify-between px-0 sm:px-5 w-screen md:w-[48rem] xl:w-[60.9375rem]'>
         {/* instagram logo */}
         <Link to='/'>
           <img src={logo} alt='instagram' className='mt-2' />
@@ -91,7 +95,7 @@ const Header = () => {
           )}
           <input
             value={search}
-            onChange={e => handleSearch(e)}
+            onChange={e => setSearch(e.target.value)}
             onFocus={() => {
               setShowSearchIcon(false)
               setSearchFocused(true)
@@ -167,7 +171,7 @@ const Header = () => {
           <div
             ref={profileRef}
             className={`${
-              activeLink === 'profile'
+              activeLink === 'profile' || currentPath === 'userprofile'
                 ? 'border-raisinblack'
                 : 'border-transparent'
             }
@@ -186,10 +190,13 @@ const Header = () => {
               <>
                 <div className='absolute h-5 w-5 bg-white -rotate-45 right-[0.2rem] top-[2.2rem] shadow-[0_0_5px_1px_rgba(0,0,0,0.0975)]'></div>
                 <div className='absolute bg-white -right-4 top-[2.5rem] rounded w-[14.375rem] py-1 shadow-[0_0_5px_1px_rgba(0,0,0,0.0975)]'>
-                  <div className='flex items-center space-x-2 px-4 py-2 hover:bg-lotion'>
+                  <Link
+                    to='/userprofile'
+                    className='flex items-center space-x-2 px-4 py-2 hover:bg-lotion'
+                  >
                     <Profile />
                     <div>Profile</div>
-                  </div>
+                  </Link>
                   <div className='flex items-center space-x-2 px-4 py-2 hover:bg-lotion'>
                     <Saved />
                     <div>Saved</div>
