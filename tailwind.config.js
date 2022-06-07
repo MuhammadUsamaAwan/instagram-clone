@@ -12,7 +12,7 @@ module.exports = {
       freshair: 'rgba(0,149,246,0.3)',
       brightgray: '#EFEFEF',
       desire: '#ED4956',
-      chinesecilver: '#C7C7C7',
+      chinesesilver: '#C7C7C7',
       philippinegray: '#8E8E8E',
       overlay: 'rgba(0,0,0,0.65)',
       metallicblue: '#385185',
