@@ -30,7 +30,7 @@ const Header = () => {
 
   const [search, setSearch] = useState('')
   const [searchFocused, setSearchFocused] = useState(false)
-  const [showSearchIcon, setShowSearchIcon] = useState('')
+  const [showSearchIcon, setShowSearchIcon] = useState(true)
   const [activeLink, setActiveLink] = useState(currentPath)
   const [searchResults, setSearchResults] = useState([])
 
@@ -108,7 +108,7 @@ const Header = () => {
               showSearchIcon && search && 'ml-6 text-philippinegray'
             } bg-brightgray outline-0`}
           />
-          {searchFocused && (
+          {search && (
             <img
               src={clear}
               alt='clear'
@@ -146,7 +146,7 @@ const Header = () => {
                       </div>
                     </Link>
                   ))}
-                {searchResults.length === 0 && (
+                {searchResults.length === 0 && search && (
                   <div className='text-sm absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2'>
                     No results found.
                   </div>
@@ -197,17 +197,23 @@ const Header = () => {
                     <Profile />
                     <div>Profile</div>
                   </Link>
-                  <div className='flex items-center space-x-2 px-4 py-2 hover:bg-lotion'>
+                  <Link
+                    to='/userprofile?saved'
+                    className='flex items-center space-x-2 px-4 py-2 hover:bg-lotion'
+                  >
                     <Saved />
                     <div>Saved</div>
-                  </div>
-                  <div className='flex items-center space-x-2 px-4 py-2 hover:bg-lotion'>
+                  </Link>
+                  <Link
+                    to='/editprofile'
+                    className='flex items-center space-x-2 px-4 py-2 hover:bg-lotion'
+                  >
                     <Settings />
                     <div>Settings</div>
-                  </div>
+                  </Link>
                   <div className='flex items-center space-x-2 px-4 py-2 mb-1 hover:bg-lotion'>
                     <Switch />
-                    <div>Switch Accounts</div>
+                    <div onClick={logout}>Switch Accounts</div>
                   </div>
                   <div
                     className='px-4 py-2 border-t border-gainsboro hover:bg-lotion'

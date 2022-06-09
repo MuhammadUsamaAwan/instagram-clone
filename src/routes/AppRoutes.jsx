@@ -6,6 +6,7 @@ import Login from '../auth/Login'
 import ForgotPassword from '../auth/ForgotPassword'
 import Home from '../pages/Home'
 import Profile from '../pages/Profile'
+import EditProfile from '../pages/EditProfile'
 
 const AppRoutes = () => {
   return (
@@ -19,6 +20,7 @@ const AppRoutes = () => {
         <Route element={<PrivateRoute />}>
           <Route path='/' element={<Home />} />
           <Route path='/userprofile' element={<Profile />} />
+          <Route path='/editprofile' element={<EditProfile />} />
         </Route>
       </Routes>
     </Router>

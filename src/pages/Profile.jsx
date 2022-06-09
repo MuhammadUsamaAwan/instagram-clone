@@ -1,5 +1,6 @@
-import { useEffect, useState, useContext } from 'react'
+import { useEffect, useState } from 'react'
 import { getDoc, doc } from 'firebase/firestore'
+import { useLocation, Link } from 'react-router-dom'
 import { auth, db } from '../config/firebase.config'
 import avatar from '../assets/images/avatar.jpg'
 import { ReactComponent as Settings } from '../assets/icons/settings.svg'
@@ -15,8 +16,11 @@ import ProfileTagged from './components/profile/ProfileTagged'
 import PublicFooter from '../layouts/PublicFooter'
 
 const Profile = () => {
+  const location = useLocation()
   const [currentUser, setCurrentUser] = useState({})
-  const [activeTab, setActiveTab] = useState('posts')
+  const [activeTab, setActiveTab] = useState(
+    location.search.slice(1) ? location.search.slice(1) : 'posts'
+  )
 
   const getProfile = async () => {
     const docRef = doc(db, 'users', auth.currentUser.uid)
@@ -41,7 +45,7 @@ const Profile = () => {
                 src={
                   auth.currentUser.photoURL ? auth.currentUser.photoURL : avatar
                 }
-                alt=''
+                alt='avatar'
               />
             </div>
           </div>
@@ -53,7 +57,7 @@ const Profile = () => {
                   {auth.currentUser.displayName}
                 </h2>
                 <button className='font-semibold rounded border border-gainsboro py-[0.3125rem] px-[0.5625rem] hidden sm:block'>
-                  Edit Profile
+                  <Link to='/editprofile'>Edit Profile</Link>
                 </button>
                 <button>
                   <Settings width={24} height={24} />
@@ -75,7 +79,7 @@ const Profile = () => {
 
             <div className='text-base'>
               <div className='font-semibold'>{currentUser?.name}</div>
-              <div>Bio</div>
+              <div>{currentUser.bio ? currentUser.bio : 'bio'}</div>
             </div>
           </div>
         </div>
@@ -84,7 +88,6 @@ const Profile = () => {
         <div className='border-t border-gainsboro mt-8 flex justify-center items-center space-x-20'>
           {/* post tab */}
           <button
-            v
             className={`${
               activeTab === 'posts' && 'border-t'
             } text-xs flex items-center py-6`}
