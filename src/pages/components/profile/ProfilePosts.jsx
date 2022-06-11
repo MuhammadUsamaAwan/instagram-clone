@@ -4,10 +4,13 @@ import { auth, db } from '../../../config/firebase.config'
 import emptyPost from '../../../assets/images/empty-post.jpg'
 import likes from '../../../assets/images/likes.png'
 import comments from '../../../assets/images/comments.png'
+import Posts from '../../../components/Post'
 
 const ProfilePosts = () => {
   const [posts, setPosts] = useState([])
   const [postsLoading, setPostsLoading] = useState(true)
+  const [openPostModal, setOpenPostModal] = useState(false)
+  const [post, setPost] = useState({})
 
   const getPosts = async () => {
     const postsRef = collection(db, 'posts')
@@ -58,9 +61,15 @@ const ProfilePosts = () => {
     return (
       <div className='grid grid-cols-3 gap-[0.1875rem] sm:gap-[1.75rem]'>
         {posts.map(post => (
-          <div className='relative'>
+          <div
+            key={post.id}
+            className='relative cursor-pointer'
+            onClick={() => {
+              setPost(post.data)
+              setOpenPostModal(true)
+            }}
+          >
             <img
-              key={post.id}
               src={post.data.image}
               className='h-[8rem] w-[8rem] md:h-[14rem] md:w-[14rem] lg:h-[18.3125rem] lg:w-[18.3125rem] object-cover hover:brightness-75 peer'
             />
@@ -84,6 +93,16 @@ const ProfilePosts = () => {
             </div>
           </div>
         ))}
+        <Posts
+          openPostModal={openPostModal}
+          setOpenPostModal={setOpenPostModal}
+          post={post}
+          userInfo={{
+            displayName: auth.currentUser.displayName,
+            photoURL: auth.currentUser.photoURL,
+          }}
+          isUser={false}
+        />
       </div>
     )
 }
