@@ -4,6 +4,7 @@ import { ReactComponent as Meta } from '../assets/icons/meta.svg'
 import ChangePassword from './components/editprofile/ChangePassword'
 import ProfileEdit from './components/editprofile/ProfileEdit'
 import PublicFooter from '../layouts/PublicFooter'
+import NoImplementationYet from './components/editprofile/NoImplementationYet'
 
 const EditProfile = () => {
   const location = useLocation()
@@ -50,7 +51,10 @@ const EditProfile = () => {
                     ? 'border-raisinblack hover:border-raisinblack font-semibold'
                     : 'border-transparent hover:border-chinesesilver hover:bg-lotion'
                 } pl-[1.875rem] pr-4 py-3.5 border-l-2 cursor-pointer`}
-                onClick={() => setActiveTable('appsWebsites')}
+                onClick={() => {
+                  setActiveTable('appsWebsites')
+                  navigate('/editprofile?appsWebsites')
+                }}
               >
                 Apps & Websites
               </div>
@@ -60,7 +64,10 @@ const EditProfile = () => {
                     ? 'border-raisinblack hover:border-raisinblack font-semibold'
                     : 'border-transparent hover:border-chinesesilver hover:bg-lotion'
                 } pl-[1.875rem] pr-4 py-3.5 border-l-2 cursor-pointer`}
-                onClick={() => setActiveTable('emailNotifications')}
+                onClick={() => {
+                  setActiveTable('emailNotifications')
+                  navigate('/editprofile?emailNotifications')
+                }}
               >
                 Email Notifications
               </div>
@@ -70,7 +77,10 @@ const EditProfile = () => {
                     ? 'border-raisinblack hover:border-raisinblack font-semibold'
                     : 'border-transparent hover:border-chinesesilver hover:bg-lotion'
                 } pl-[1.875rem] pr-4 py-3.5 border-l-2 cursor-pointer`}
-                onClick={() => setActiveTable('pushNotifications')}
+                onClick={() => {
+                  setActiveTable('pushNotifications')
+                  navigate('/editprofile?pushNotifications')
+                }}
               >
                 Push Notifications
               </div>
@@ -80,7 +90,10 @@ const EditProfile = () => {
                     ? 'border-raisinblack hover:border-raisinblack font-semibold'
                     : 'border-transparent hover:border-chinesesilver hover:bg-lotion'
                 } pl-[1.875rem] pr-4 py-3.5 border-l-2 cursor-pointer`}
-                onClick={() => setActiveTable('manageContacts')}
+                onClick={() => {
+                  setActiveTable('manageContacts')
+                  navigate('/editprofile?manageContacts')
+                }}
               >
                 Manage Contacts
               </div>
@@ -90,7 +103,10 @@ const EditProfile = () => {
                     ? 'border-raisinblack hover:border-raisinblack font-semibold'
                     : 'border-transparent hover:border-chinesesilver hover:bg-lotion'
                 } pl-[1.875rem] pr-4 py-3.5 border-l-2 cursor-pointer`}
-                onClick={() => setActiveTable('privacySecurity')}
+                onClick={() => {
+                  setActiveTable('privacySecurity')
+                  navigate('/editprofile?privacySecurity')
+                }}
               >
                 Privacy and Security
               </div>
@@ -100,7 +116,10 @@ const EditProfile = () => {
                     ? 'border-raisinblack hover:border-raisinblack font-semibold'
                     : 'border-transparent hover:border-chinesesilver hover:bg-lotion'
                 } pl-[1.875rem] pr-4 py-3.5 border-l-2 cursor-pointer`}
-                onClick={() => setActiveTable('loginActivity')}
+                onClick={() => {
+                  setActiveTable('loginActivity')
+                  navigate('/editprofile?loginActivity')
+                }}
               >
                 Login Activity
               </div>
@@ -110,7 +129,10 @@ const EditProfile = () => {
                     ? 'border-raisinblack hover:border-raisinblack font-semibold'
                     : 'border-transparent hover:border-chinesesilver hover:bg-lotion'
                 } pl-[1.875rem] pr-4 py-3.5 border-l-2 cursor-pointer`}
-                onClick={() => setActiveTable('emailsInstagram')}
+                onClick={() => {
+                  setActiveTable('emailsInstagram')
+                  navigate('/editprofile?emailsInstagram')
+                }}
               >
                 Email From Instagram
               </div>
@@ -120,7 +142,10 @@ const EditProfile = () => {
                     ? 'border-raisinblack hover:border-raisinblack font-semibold'
                     : 'border-transparent hover:border-chinesesilver hover:bg-lotion'
                 } pl-[1.875rem] pr-4 py-3.5 border-l-2 cursor-pointer`}
-                onClick={() => setActiveTable('help')}
+                onClick={() => {
+                  setActiveTable('help')
+                  navigate('/editprofile?help')
+                }}
               >
                 Help
               </div>
@@ -149,6 +174,8 @@ const EditProfile = () => {
             <div className='flex-[3] sm:border-t sm:border-b sm:border-r border-gainsboro sm:py-8 sm:px-10 px-2 bg-transparent sm:bg-white border-0'>
               {activeTab === 'editProfile' && <ProfileEdit />}
               {activeTab === 'changePassword' && <ChangePassword />}
+              {activeTab !== 'editProfile' &&
+                activeTab !== 'changePassword' && <NoImplementationYet />}
             </div>
           </div>
         </div>

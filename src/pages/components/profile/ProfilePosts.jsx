@@ -8,6 +8,7 @@ const ProfilePosts = () => {
           src={emptyPost}
           alt='no posts yet'
           className='sm:h-[23.75rem] sm:w-[23.75rem] w-full h-auto'
+          loading='lazy'
         />
       </div>
       <div className='text-lg flex-1 bg-transparent sm:bg-white text-center sm:flex justify-center flex-col order-1 sm:order-2 py-12 sm:py-0'>

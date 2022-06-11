@@ -18,9 +18,7 @@ import PublicFooter from '../layouts/PublicFooter'
 const Profile = () => {
   const location = useLocation()
   const [currentUser, setCurrentUser] = useState({})
-  const [activeTab, setActiveTab] = useState(
-    location.search.slice(1) ? location.search.slice(1) : 'posts'
-  )
+  const [activeTab, setActiveTab] = useState('')
 
   const getProfile = async () => {
     const docRef = doc(db, 'users', auth.currentUser.uid)
@@ -34,6 +32,10 @@ const Profile = () => {
     getProfile()
   }, [])
 
+  useEffect(() => {
+    setActiveTab(location.search.slice(1) ? location.search.slice(1) : 'posts')
+  }, [location])
+
   return (
     <section className='grid place-content-center'>
       <div className='py-[1.875rem] px-0 sm:px-5 w-screen md:w-[48rem] xl:w-[60.9375rem] min-h-[82vh]'>
@@ -46,6 +48,7 @@ const Profile = () => {
                   auth.currentUser.photoURL ? auth.currentUser.photoURL : avatar
                 }
                 alt='avatar'
+                loading='lazy'
               />
             </div>
           </div>

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { getDoc, doc, updateDoc } from 'firebase/firestore'
 import { updateProfile } from 'firebase/auth'
+import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage'
+import { v4 as uuidv4 } from 'uuid'
 import { auth, db } from '../../../config/firebase.config'
 import avatar from '../../../assets/images/avatar.jpg'
 
@@ -11,6 +13,12 @@ const ProfileEdit = () => {
   const [submitLoading, setSubmitLoading] = useState(false)
   const [submitError, setSubmitError] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
+  const [photoUploadLoading, setPhotoUploadLoading] = useState(false)
+  const [photoUploadError, setPhotoUploadError] = useState(false)
+  const [profilePhoto, setProfilePhoto] = useState(
+    auth.currentUser.photoURL ? auth.currentUser.photoURL : avatar
+  )
+
   const getProfile = async () => {
     const docRef = doc(db, 'users', auth.currentUser.uid)
     const docSnap = await getDoc(docRef)
@@ -47,29 +55,77 @@ const ProfileEdit = () => {
     }
   }
 
+  const handleProfilePhotoUpload = async e => {
+    setPhotoUploadLoading(true)
+    if (
+      e.target.files[0].type.includes('png') ||
+      e.target.files[0].type.includes('jpeg')
+    ) {
+      try {
+        const storage = getStorage()
+        const fileName = `${auth.currentUser.uid}-${
+          e.target.files[0].name
+        }-${uuidv4()}`
+        const storageRef = ref(storage, 'profilePhotos/' + fileName)
+        await uploadBytes(storageRef, e.target.files[0])
+        const photoURL = await getDownloadURL(storageRef)
+        updateProfile(auth.currentUser, { photoURL })
+        await updateDoc(doc(db, 'users', auth.currentUser.uid), {
+          photoURL,
+        })
+        setProfilePhoto(photoURL)
+      } catch (err) {
+        setPhotoUploadError(err.message)
+      }
+    } else {
+      setPhotoUploadError('Please upload a png or a jpeg file')
+    }
+    setPhotoUploadLoading(false)
+    document.getElementById('profilePhoto').value = ''
+  }
+
   return (
     <form onSubmit={e => handleSubmit(e)}>
       {/* edit photo */}
       <div className='flex items-center justify-center mb-4'>
         <div className='flex flex-1 justify-end'>
           <div className='rounded-full overflow-hidden flex items-center justify-center h-[2.625rem] w-[2.625rem]'>
-            <img
-              src={
-                auth.currentUser.photoURL ? auth.currentUser.photoURL : avatar
-              }
-              alt='avatar'
-            />
+            <img src={profilePhoto} alt='avatar' loading='lazy' />
           </div>
         </div>
         <div className='flex-[4] ml-8'>
           <h1 className='text-[1.25rem] mb-0.5'>
             {auth.currentUser.displayName}
           </h1>
-          <button type='button' className='text-vividcerulean font-semibold'>
+          <label
+            htmlFor='profilePhoto'
+            className={`${
+              photoUploadLoading
+                ? 'text-freshair pointer-events-none'
+                : 'text-vividcerulean cursor-pointer'
+            } font-semibold `}
+          >
             Change Profile Photo
-          </button>
+          </label>
+          <input
+            type='file'
+            id='profilePhoto'
+            accept='image/gif, image/jpeg'
+            className='hidden'
+            onChange={e => handleProfilePhotoUpload(e)}
+            disabled={photoUploadLoading}
+          />
         </div>
       </div>
+      {/* photo error */}
+      {photoUploadError && (
+        <div className='flex items-center justify-center mb-4'>
+          <div className='flex flex-1 justify-end'></div>
+          <div className='flex-[4] ml-8'>
+            <p className='text-desire w-[70%]'>{photoUploadError}</p>
+          </div>
+        </div>
+      )}
       {/* name */}
       <div className='flex items-center justify-center mb-4'>
         <div className='flex flex-1 justify-end'>

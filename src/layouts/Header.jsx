@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { auth, db } from '../config/firebase.config'
 import { collection, getDocs, query, where, limit } from 'firebase/firestore'
@@ -80,15 +80,15 @@ const Header = () => {
           <img src={logo} alt='instagram' className='mt-2' />
         </Link>
         {/* Search */}
-        <div className='relative bg-brightgray px-4 py-1.5 rounded-md w-[16.75rem] text-base hidden sm:block'>
+        <div className='relative bg-brightgray px-4 py-1.5 rounded-md w-[16.75rem] text-base hidden sm:block ml-[10rem]'>
           {showSearchIcon && (
             <Search className='absolute top-1/2 -translate-y-1/2' />
           )}
           {!search && (
             <label
               className={`${
-                showSearchIcon && 'left-10'
-              } absolute pointer-events-none top-1/2 -translate-y-1/2 text-philippinegray`}
+                showSearchIcon && 'left-11'
+              } absolute pointer-events-none top-1/2 -translate-y-1/2 text-philippinegray font-light`}
             >
               Search
             </label>

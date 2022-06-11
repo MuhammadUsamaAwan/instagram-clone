@@ -52,6 +52,7 @@ const ChangePassword = () => {
                 auth.currentUser.photoURL ? auth.currentUser.photoURL : avatar
               }
               alt='avatar'
+              loading='lazy'
             />
           </div>
         </div>
