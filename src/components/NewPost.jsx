@@ -1,13 +1,23 @@
 import React, { useState } from 'react'
 import Modal from 'react-modal'
+import { serverTimestamp, addDoc, collection } from 'firebase/firestore'
+import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage'
+import { v4 as uuidv4 } from 'uuid'
+import { auth, db } from '..//config/firebase.config'
+import avatar from '../assets/images/avatar.jpg'
 import { ReactComponent as NewPostIcon } from '../assets/icons/newpost.svg'
 import { ReactComponent as ErrorIcon } from '../assets/icons/error.svg'
 import { ReactComponent as LeftArrow } from '../assets/icons/left-arrow.svg'
 import { useDropzone } from 'react-dropzone'
+import { useNavigate } from 'react-router-dom'
 
 const NewPost = ({ openPostModal, setOpenPostModal }) => {
+  const navigate = useNavigate()
   const [image, setImage] = useState(null)
   const [error, setError] = useState('')
+  const [caption, setCaption] = useState('')
+  const [submitLoading, setSubmitLoading] = useState(false)
+
   Modal.setAppElement(document.getElementById('root'))
 
   const onDrop = (acceptedFiles, fileRejections) => {
@@ -25,19 +35,41 @@ const NewPost = ({ openPostModal, setOpenPostModal }) => {
     }
   }
 
-  const { getRootProps, getInputProps, open, acceptedFiles, fileRejections } =
-    useDropzone({
-      onDrop,
-      noClick: true,
-      maxFiles: 1,
-      maxSize: 5 * 1024 * 1024,
-      minSize: 1 * 1024,
-      accept: {
-        'image/jpeg': [],
-        'image/png': [],
-        'video/mp4': [],
-      },
-    })
+  const { getRootProps, getInputProps, open, acceptedFiles } = useDropzone({
+    onDrop,
+    noClick: true,
+    maxFiles: 1,
+    maxSize: 2 * 1024 * 1024,
+    minSize: 1 * 1024,
+    accept: {
+      'image/jpeg': [],
+      'image/png': [],
+    },
+  })
+
+  const handlePost = async () => {
+    setSubmitLoading(true)
+    try {
+      const storage = getStorage()
+      const fileName = `${auth.currentUser.uid}-${
+        acceptedFiles[0].name
+      }-${uuidv4()}`
+      const storageRef = ref(storage, 'posts/' + fileName)
+      await uploadBytes(storageRef, acceptedFiles[0])
+      const photoURL = await getDownloadURL(storageRef)
+      await addDoc(collection(db, 'posts'), {
+        image: photoURL,
+        caption,
+        timestamp: serverTimestamp(),
+        userRef: auth.currentUser.uid,
+      })
+      setOpenPostModal(false)
+      navigate('/userprofile?posts')
+    } catch (err) {
+      console.error(err.message)
+    }
+    setSubmitLoading(false)
+  }
 
   return (
     <Modal
@@ -60,25 +92,38 @@ const NewPost = ({ openPostModal, setOpenPostModal }) => {
         },
       }}
     >
-      <div className='w-[21.75rem] xl:w-[45rem] min-h-[59vh] sm:min-h-[81vh] flex flex-col'>
+      <div className='w-[21.75rem] xl:w-[45rem] h-[59vh] sm:h-[81vh] flex flex-col'>
+        {/* header */}
         <div className='text-base text-center bg-lotion p-2.5 font-semibold border-b border-gainsboro'>
           {error && "File couldn't be uploaded"}
           {!image && !error && 'Create new post'}
           {image && (
             <div className='flex items-center justify-between px-1'>
               <LeftArrow
-                onClick={() => setImage(null)}
+                onClick={() => {
+                  setImage(null)
+                  setCaption('')
+                }}
                 className='cursor-pointer'
               />
-              <div>Crop</div>
-              <button className='text-vividcerulean text-sm font-semibold'>
-                Next
+              <div>Post</div>
+              <button
+                className={`${
+                  submitLoading
+                    ? 'text-freshair pointer-events-none'
+                    : 'text-vividcerulean'
+                } text-sm font-semibold`}
+                onClick={handlePost}
+                disabled={submitLoading}
+              >
+                Post
               </button>
             </div>
           )}
         </div>
+        {/* content */}
         <div
-          className='flex-1 grid content-center place-items-center'
+          className='flex-1 grid content-center place-items-center relative'
           {...getRootProps()}
         >
           {!image && !error && (
@@ -95,9 +140,37 @@ const NewPost = ({ openPostModal, setOpenPostModal }) => {
               <h2 className='text-[1.375rem] font-light mb-6'>{error}</h2>
             </>
           )}
-          {image && <img src={image?.data} className='h-full w-full' />}
+          {image && (
+            <div>
+              <div className='absolute top-4 left-0 px-4 w-full'>
+                <div className='flex items-center space-x-3 mb-2'>
+                  <div className='w-[1.75rem] h-[1.75rem] overflow-hidden rounded-full flex'>
+                    <img
+                      src={
+                        auth.currentUser.photoURL
+                          ? auth.currentUser.photoURL
+                          : avatar
+                      }
+                      alt='profile'
+                    />
+                  </div>
+                  <div className='text-base font-semibold'>
+                    {auth.currentUser.displayName}
+                  </div>
+                </div>
+                <textarea
+                  className='w-full text-base outline-0 resize-none top-2 left-0 border-b border-gainsboro'
+                  maxLength='50'
+                  placeholder='Write a caption...'
+                  value={caption}
+                  onChange={e => setCaption(e.target.value)}
+                />
+              </div>
+              <img src={image?.data} />
+            </div>
+          )}
           <input type='file' {...getInputProps()} />
-          {!image && (
+          {!image && !error && (
             <p
               className='bg-vividcerulean text-white font-semibold py-[0.3125rem] px-[0.5625rem] rounded cursor-pointer'
               onClick={open}
