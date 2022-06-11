@@ -67,11 +67,15 @@ const Profile = () => {
                 <button className='font-semibold rounded border border-gainsboro py-[0.3125rem] px-[0.5625rem] hidden sm:block'>
                   <Link to='/editprofile'>Edit Profile</Link>
                 </button>
-                <button onClick={() => setOpenModal(true)}>
+                <button
+                  onClick={() => setOpenModal(true)}
+                  className='outline-0'
+                >
                   <Settings width={24} height={24} />
                 </button>
                 <Modal
                   isOpen={openModal}
+                  onRequestClose={() => setOpenModal(false)}
                   closeTimeoutMS={100}
                   style={{
                     overlay: {
@@ -88,7 +92,6 @@ const Profile = () => {
                       padding: 0,
                     },
                   }}
-                  onRequestClose={() => setOpenModal(false)}
                 >
                   <div className='flex flex-col text-center w-[25rem]'>
                     <Link
@@ -173,7 +176,7 @@ const Profile = () => {
 
             <div className='text-base'>
               <div className='font-semibold'>{currentUser?.name}</div>
-              <div>{currentUser.bio ? currentUser.bio : 'bio'}</div>
+              {currentUser.bio && <div>{currentUser.bio}</div>}
             </div>
           </div>
         </div>

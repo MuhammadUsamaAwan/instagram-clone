@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getDoc, doc } from 'firebase/firestore'
-import { useLocation, Link, useNavigate, useParams } from 'react-router-dom'
-import { auth, db } from '../config/firebase.config'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { db } from '../config/firebase.config'
 import avatar from '../assets/images/avatar.jpg'
 import { ReactComponent as PostsIcon } from '../assets/icons/posts-profile.svg'
 import { ReactComponent as PostsActiveIcon } from '../assets/icons/posts-profile-active.svg'
@@ -9,9 +9,6 @@ import { ReactComponent as VideosIcon } from '../assets/icons/videos.svg'
 import { ReactComponent as VideosActiveIcon } from '../assets/icons/videos-active.svg'
 import { ReactComponent as TaggedIcon } from '../assets/icons/tagged.svg'
 import { ReactComponent as TaggedActiveIcon } from '../assets/icons/tagged-active.svg'
-import ProfilePosts from './components/profile/ProfilePosts'
-import ProfileSaved from './components/profile/ProfileSaved'
-import ProfileTagged from './components/profile/ProfileTagged'
 import PublicFooter from '../layouts/PublicFooter'
 import UsersPost from './components/users/UsersPost'
 import UsersVideos from './components/users/UsersVideos'
@@ -80,7 +77,7 @@ const UserProfile = () => {
 
             <div className='text-base'>
               <div className='font-semibold'>{user.name}</div>
-              <div>{user.bio ? user.bio : 'bio'}</div>
+              {user.bio && <div>{user.bio}</div>}
             </div>
           </div>
         </div>

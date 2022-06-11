@@ -22,6 +22,7 @@ import { ReactComponent as Profile } from '../assets/icons/profile.svg'
 import { ReactComponent as Saved } from '../assets/icons/saved.svg'
 import { ReactComponent as Settings } from '../assets/icons/settings.svg'
 import { ReactComponent as Switch } from '../assets/icons/switch.svg'
+import NewPost from '../components/NewPost'
 
 const Header = () => {
   const location = useLocation()
@@ -33,6 +34,7 @@ const Header = () => {
   const [showSearchIcon, setShowSearchIcon] = useState(true)
   const [activeLink, setActiveLink] = useState(currentPath)
   const [searchResults, setSearchResults] = useState([])
+  const [openPostModal, setOpenPostModal] = useState(false)
 
   const profileRef = useRef()
 
@@ -164,12 +166,16 @@ const Header = () => {
           )}
         </div>
         {/* icons */}
-        <div className='flex items-center justify-center space-x-5 sm:space-x-6'>
+        <div className='flex items-center justify-center space-x-5 sm:space-x-[1.32rem]'>
           <Link to='/'>{activeLink === '' ? <HomeActive /> : <Home />}</Link>
           <Link to='/dm'>{activeLink === 'dm' ? <DMActive /> : <DM />}</Link>
-          <Link to='/post'>
+          <button onClick={() => setOpenPostModal(true)} className='outline-0'>
             {activeLink === 'post' ? <PostActive /> : <Post />}
-          </Link>
+          </button>
+          <NewPost
+            openPostModal={openPostModal}
+            setOpenPostModal={setOpenPostModal}
+          />
           <Link to='/find'>
             {activeLink === 'find' ? <FindActive /> : <Find />}
           </Link>
