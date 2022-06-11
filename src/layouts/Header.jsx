@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { auth, db } from '../config/firebase.config'
 import { collection, getDocs, query, where, limit } from 'firebase/firestore'
@@ -53,8 +53,14 @@ const Header = () => {
   useDebounce(
     async () => {
       if (search) {
+        const searchCapitalized =
+          search.charAt(0).toUpperCase() + search.slice(1)
         const usersRef = collection(db, 'users')
-        const q = query(usersRef, where('userName', '>=', search), limit(20))
+        const q = query(
+          usersRef,
+          where('userName', '>=', searchCapitalized),
+          limit(20)
+        )
         const querySnap = await getDocs(q)
         const users = []
         querySnap.forEach(doc => {
@@ -102,13 +108,15 @@ const Header = () => {
             }}
             onBlur={() => {
               setShowSearchIcon(true)
-              setSearchFocused(false)
+              setTimeout(() => {
+                setSearchFocused(false)
+              }, 150)
             }}
             className={`${
               showSearchIcon && search && 'ml-6 text-philippinegray'
             } bg-brightgray outline-0`}
           />
-          {search && (
+          {searchFocused && (
             <img
               src={clear}
               alt='clear'

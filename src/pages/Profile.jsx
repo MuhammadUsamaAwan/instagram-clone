@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getDoc, doc } from 'firebase/firestore'
-import { useLocation, Link } from 'react-router-dom'
+import { useLocation, Link, useNavigate } from 'react-router-dom'
 import { auth, db } from '../config/firebase.config'
 import avatar from '../assets/images/avatar.jpg'
 import { ReactComponent as Settings } from '../assets/icons/settings.svg'
@@ -14,11 +14,14 @@ import ProfilePosts from './components/profile/ProfilePosts'
 import ProfileSaved from './components/profile/ProfileSaved'
 import ProfileTagged from './components/profile/ProfileTagged'
 import PublicFooter from '../layouts/PublicFooter'
+import Modal from 'react-modal'
 
 const Profile = () => {
   const location = useLocation()
+  const navigate = useNavigate()
   const [currentUser, setCurrentUser] = useState({})
   const [activeTab, setActiveTab] = useState('')
+  const [openModal, setOpenModal] = useState(false)
 
   const getProfile = async () => {
     const docRef = doc(db, 'users', auth.currentUser.uid)
@@ -35,6 +38,8 @@ const Profile = () => {
   useEffect(() => {
     setActiveTab(location.search.slice(1) ? location.search.slice(1) : 'posts')
   }, [location])
+
+  Modal.setAppElement(document.getElementById('root'))
 
   return (
     <section className='grid place-content-center'>
@@ -62,9 +67,95 @@ const Profile = () => {
                 <button className='font-semibold rounded border border-gainsboro py-[0.3125rem] px-[0.5625rem] hidden sm:block'>
                   <Link to='/editprofile'>Edit Profile</Link>
                 </button>
-                <button>
+                <button onClick={() => setOpenModal(true)}>
                   <Settings width={24} height={24} />
                 </button>
+                <Modal
+                  isOpen={openModal}
+                  closeTimeoutMS={100}
+                  style={{
+                    overlay: {
+                      backgroundColor: 'rgba(0, 0, 0, 0.65)',
+                    },
+                    content: {
+                      border: 0,
+                      borderRadius: '0.75rem',
+                      width: 'fit-content',
+                      height: 'fit-content',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      padding: 0,
+                    },
+                  }}
+                  onRequestClose={() => setOpenModal(false)}
+                >
+                  <div className='flex flex-col text-center w-[25rem]'>
+                    <Link
+                      to='/editprofile?changePassword'
+                      className='w-full p-3.5 border-b border-gainsboro'
+                    >
+                      Change Password
+                    </Link>
+                    <div className='w-full p-3.5 border-b border-gainsboro'>
+                      QR Code
+                    </div>
+                    <Link
+                      to='/editprofile?appsWebsites'
+                      className='w-full p-3.5 border-b border-gainsboro'
+                    >
+                      Apps and Websites
+                    </Link>
+                    <Link
+                      to='/editprofile?emailNotifications'
+                      className='w-full p-3.5 border-b border-gainsboro'
+                    >
+                      Notifications
+                    </Link>
+                    <Link
+                      to='/editprofile?privacySecurity'
+                      className='w-full p-3.5 border-b border-gainsboro'
+                    >
+                      Privacy & Security
+                    </Link>
+                    <Link
+                      to='/editprofile?loginActivity'
+                      className='w-full p-3.5 border-b border-gainsboro'
+                    >
+                      Login activity
+                    </Link>
+                    <Link
+                      to='/editprofile?emailsInstagram'
+                      className='w-full p-3.5 border-b border-gainsboro'
+                    >
+                      Emails from Instagram
+                    </Link>
+                    <Link
+                      to='/editprofile?help'
+                      className='w-full p-3.5 border-b border-gainsboro'
+                    >
+                      Report a Problem
+                    </Link>
+                    <button className='w-full p-3.5 border-b border-gainsboro'>
+                      Embed
+                    </button>
+                    <button
+                      className='w-full p-3.5 border-b border-gainsboro'
+                      onClick={() => {
+                        auth.signOut()
+                        navigate('/login')
+                      }}
+                    >
+                      Logout
+                    </button>
+                    <button
+                      onClick={() => setOpenModal(false)}
+                      className='flex-1 p-3.5'
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </Modal>
               </div>
             </div>
 
@@ -94,7 +185,10 @@ const Profile = () => {
             className={`${
               activeTab === 'posts' && 'border-t'
             } text-xs flex items-center py-6`}
-            onClick={() => setActiveTab('posts')}
+            onClick={() => {
+              setActiveTab('posts')
+              navigate('/userprofile?posts')
+            }}
           >
             {activeTab === 'posts' ? <PostsActiveIcon /> : <PostsIcon />}
             <span
@@ -110,7 +204,10 @@ const Profile = () => {
             className={`${
               activeTab === 'saved' && 'border-t'
             } text-xs flex items-center py-6`}
-            onClick={() => setActiveTab('saved')}
+            onClick={() => {
+              setActiveTab('saved')
+              navigate('/userprofile?saved')
+            }}
           >
             {activeTab === 'saved' ? <SavedActiveIcon /> : <SavedIcon />}
             <span
@@ -126,7 +223,10 @@ const Profile = () => {
             className={`${
               activeTab === 'tagged' && 'border-t'
             } text-xs flex items-center  py-6`}
-            onClick={() => setActiveTab('tagged')}
+            onClick={() => {
+              setActiveTab('tagged')
+              navigate('/userprofile?tagged')
+            }}
           >
             {activeTab === 'tagged' ? <TaggedActiveIcon /> : <TaggedIcon />}
             <span

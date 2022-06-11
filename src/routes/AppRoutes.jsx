@@ -7,6 +7,7 @@ import ForgotPassword from '../auth/ForgotPassword'
 import Home from '../pages/Home'
 import Profile from '../pages/Profile'
 import EditProfile from '../pages/EditProfile'
+import UsersProfile from '../pages/UsersProfile'
 
 const AppRoutes = () => {
   return (
@@ -21,6 +22,7 @@ const AppRoutes = () => {
           <Route path='/' element={<Home />} />
           <Route path='/userprofile' element={<Profile />} />
           <Route path='/editprofile' element={<EditProfile />} />
+          <Route path='/users/:id' element={<UsersProfile />} />
         </Route>
       </Routes>
     </Router>
