@@ -177,10 +177,16 @@ const Profile = () => {
                 <span className='font-semibold mr-1'>{postCount}</span>posts
               </div>
               <div>
-                <span className='font-semibold mr-1'>0</span>followers
+                <span className='font-semibold mr-1'>
+                  {currentUser?.followers ? currentUser?.followers.length : 0}
+                </span>
+                followers
               </div>
               <div>
-                <span className='font-semibold mr-1'>0</span>following
+                <span className='font-semibold mr-1'>
+                  {currentUser?.following ? currentUser?.following.length : 0}
+                </span>
+                following
               </div>
             </div>
 

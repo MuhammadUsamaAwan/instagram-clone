@@ -55,11 +55,17 @@ const UserProfile = () => {
     await updateDoc(doc(db, 'users', params.id), {
       followers: arrayRemove(auth.currentUser.uid),
     })
+    await updateDoc(doc(db, 'users', auth.currentUser.uid), {
+      following: arrayRemove(params.id),
+    })
   }
 
   const handleFollow = async () => {
     await updateDoc(doc(db, 'users', params.id), {
       followers: arrayUnion(auth.currentUser.uid),
+    })
+    await updateDoc(doc(db, 'users', auth.currentUser.uid), {
+      following: arrayUnion(params.id),
     })
   }
 
@@ -172,7 +178,10 @@ const UserProfile = () => {
                 followers
               </div>
               <div>
-                <span className='font-semibold mr-1'>0</span>following
+                <span className='font-semibold mr-1'>
+                  {user?.following ? user?.following.length : 0}
+                </span>
+                following
               </div>
             </div>
 
