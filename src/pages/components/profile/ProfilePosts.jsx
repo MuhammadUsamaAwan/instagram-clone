@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react'
 import { collection, getDocs, query, where, limit } from 'firebase/firestore'
 import { auth, db } from '../../../config/firebase.config'
+import { useLocation } from 'react-router-dom'
 import emptyPost from '../../../assets/images/empty-post.jpg'
 import likes from '../../../assets/images/likes.png'
 import comments from '../../../assets/images/comments.png'
 import Posts from '../../../components/Post'
 
 const ProfilePosts = () => {
+  const location = useLocation()
   const [posts, setPosts] = useState([])
   const [postsLoading, setPostsLoading] = useState(true)
   const [openPostModal, setOpenPostModal] = useState(false)
@@ -32,8 +34,8 @@ const ProfilePosts = () => {
   }
 
   useEffect(() => {
-    if (!openPostModal) getPosts()
-  }, [openPostModal])
+    if (!openPostModal || location.hash === '#postadded') getPosts()
+  }, [openPostModal, location])
 
   if (postsLoading) return <></>
 
@@ -99,12 +101,6 @@ const ProfilePosts = () => {
         <Posts
           openPostModal={openPostModal}
           setOpenPostModal={setOpenPostModal}
-          post={post.data}
-          userInfo={{
-            displayName: auth.currentUser.displayName,
-            photoURL: auth.currentUser.photoURL,
-          }}
-          isUser={false}
           postId={post.id}
         />
       </div>

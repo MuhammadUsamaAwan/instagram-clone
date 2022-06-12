@@ -23,3 +23,7 @@
 .ReactModal__Overlay--before-close{
     opacity: 0;
 }
+
+.post-comment::-webkit-scrollbar {
+    display: none;
+}

@@ -6,27 +6,43 @@ import { ReactComponent as Unlike } from '../assets/icons/liked.svg'
 import { ReactComponent as Comment } from '../assets/icons/commentpost.svg'
 import { ReactComponent as Share } from '../assets/icons/share.svg'
 import { ReactComponent as Saved } from '../assets/icons/savedpost.svg'
-import { updateDoc, doc, arrayUnion, arrayRemove } from 'firebase/firestore'
+import {
+  getDoc,
+  updateDoc,
+  doc,
+  arrayUnion,
+  arrayRemove,
+} from 'firebase/firestore'
 import { auth, db } from '../config/firebase.config'
 import moment from 'moment'
-const Post = ({
-  openPostModal,
-  setOpenPostModal,
-  post,
-  isUser = true,
-  isFollowed = false,
-  userInfo,
-  postId,
-}) => {
+
+const Post = ({ openPostModal, setOpenPostModal, postId }) => {
+  const [postData, setPostData] = useState()
+  const [submitLikeLoading, setSubmitLikeLoading] = useState(false)
   const [comment, setComment] = useState('')
   const [submitCommentLoading, setSubmitCommentLoading] = useState(false)
   const [submitCommentDisabled, setSubmitCommentDisabled] = useState(true)
-  const [submitLikeLoading, setSubmitLikeLoading] = useState(false)
-  const [liked, setLiked] = useState(post?.likes.includes(auth.currentUser.uid))
-  const [likes, setLikes] = useState(post?.likes.length)
+
+  const getPost = async () => {
+    const docRef = doc(db, 'posts', postId)
+    const docSnap = await getDoc(docRef)
+    if (docSnap.exists()) {
+      setPostData(docSnap.data())
+    }
+  }
+
   Modal.setAppElement(document.getElementById('root'))
 
-  const handleComment = async () => {
+  const handleLike = async () => {
+    setSubmitLikeLoading(true)
+    await updateDoc(doc(db, 'posts', postId), {
+      likes: arrayUnion(auth.currentUser.uid),
+    })
+    setSubmitLikeLoading(false)
+  }
+
+  const handleComment = async e => {
+    e.preventDefault()
     setSubmitCommentLoading(true)
     await updateDoc(doc(db, 'posts', postId), {
       comments: arrayUnion({
@@ -35,17 +51,8 @@ const Post = ({
         photoURL: auth.currentUser.photoURL,
       }),
     })
+    setComment('')
     setSubmitCommentLoading(false)
-  }
-
-  const handleLike = async () => {
-    setSubmitLikeLoading(true)
-    await updateDoc(doc(db, 'posts', postId), {
-      likes: arrayUnion(auth.currentUser.uid),
-    })
-    setLiked(true)
-    setLikes(likes => ++likes)
-    setSubmitLikeLoading(false)
   }
 
   const handleUnlike = async () => {
@@ -53,12 +60,12 @@ const Post = ({
     await updateDoc(doc(db, 'posts', postId), {
       likes: arrayRemove(auth.currentUser.uid),
     })
-    setLiked(false)
-    setLikes(likes => --likes)
     setSubmitLikeLoading(false)
   }
 
-  useEffect(() => {}, [post])
+  useEffect(() => {
+    if (postId) getPost()
+  }, [postId, handleLike, handleUnlike, handleComment])
 
   useEffect(() => {
     if (comment) setSubmitCommentDisabled(false)
@@ -86,41 +93,62 @@ const Post = ({
         },
       }}
     >
-      {/* image */}
       <div className='w-[75vw] h-[50vh] sm:h-[94vh] bg-white flex'>
+        {/* image */}
         <img
-          src={post?.image}
+          src={postData?.image}
           alt='post'
-          className='h-full w-[65%] object-cover'
+          className='h-full w-1/2 sm:w-[65%] object-cover'
         />
         {/* post info */}
-        <div className='w-[35%] flex flex-col'>
+        <div className='w-1/2 sm:w-[35%] flex flex-col'>
           {/* user info */}
           <div className='flex items-center space-x-3 mb-2 px-4 pt-3.5'>
             <div className='w-8 h-8 overflow-hidden rounded-full flex'>
               <img
-                src={userInfo.photoURL ? userInfo.photoURL : avatar}
+                src={postData?.photoURL ? postData?.photoURL : avatar}
                 alt='profile'
               />
             </div>
-            <div className='font-semibold'>{userInfo.displayName}</div>
-            {!isFollowed && isUser && (
+            <div className='font-semibold'>{postData?.displayName}</div>
+            {postData?.userRef !== auth.currentUser.uid && (
               <button className='text-vividcerulean font-semibold'>
                 Follow
               </button>
             )}
           </div>
           <p className='px-4 border-b border-gainsboro pb-3.5'>
-            {post?.caption}
+            {postData?.caption}
           </p>
           {/* comments */}
-          <div className='flex-1 px-4 py-3.5'>No comments yet...</div>
+          {postData?.comments.length !== 0 ? (
+            <div className='flex-1 px-4 py-3.5 overflow-scroll post-comment'>
+              {postData?.comments.map(comment => (
+                <div key={comment?.comment} className='mb-4 flex space-x-3'>
+                  <img
+                    src={comment?.photoURL ? comment?.photoURL : avatar}
+                    alt='profile'
+                    className='w-8 h-8 rounded-full object-cover'
+                  />
+                  <div className='font-semibold'>
+                    {comment?.userName}
+                    <span className='ml-1 font-normal'>{comment?.comment}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className='flex-1 px-4 py-3.5'>No comments yet...</div>
+          )}
           {/* actions */}
           <div className='px-4 flex items-center justify-between py-3.5 border-t border-gainsboro'>
             <div className='flex items-center space-x-4'>
               <button disabled={submitLikeLoading} className='cursor-pointer'>
-                {!liked && <Like onClick={handleLike} />}
-                {liked && <Unlike onClick={handleUnlike} />}
+                {postData?.likes.includes(auth.currentUser.uid) ? (
+                  <Unlike onClick={handleUnlike} />
+                ) : (
+                  <Like onClick={handleLike} />
+                )}
               </button>
               <label htmlFor='comment' className='cursor-pointer'>
                 <Comment />
@@ -130,13 +158,15 @@ const Post = ({
             <Saved />
           </div>
           {/* likes */}
-          <div className='font-semibold px-4'>{likes} likes</div>
+          <div className='font-semibold px-4'>
+            {postData?.likes ? postData?.likes.length : 0} likes
+          </div>
           {/* time */}
           <div className='px-4 uppercase text-[0.625rem] text-philippinegray pb-3.5 border-b border-gainsboro'>
-            {moment(post?.timestamp?.toDate()).fromNow()}
+            {moment(postData?.timestamp?.toDate()).fromNow()}
           </div>
           {/* new comment */}
-          <form className='flex px-4' onSubmit={handleComment}>
+          <form className='flex px-4' onSubmit={e => handleComment(e)}>
             <input
               id='comment'
               placeholder='Add a comment...'
@@ -149,7 +179,7 @@ const Post = ({
               className={`${
                 submitCommentLoading || submitCommentDisabled
                   ? 'text-freshair'
-                  : 'text-vividcerulean pointer-events-none'
+                  : 'text-vividcerulean'
               } font-semibold`}
               disabled={submitCommentLoading || submitCommentDisabled}
             >

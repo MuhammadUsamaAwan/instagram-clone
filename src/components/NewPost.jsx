@@ -64,9 +64,11 @@ const NewPost = ({ openPostModal, setOpenPostModal }) => {
         userRef: auth.currentUser.uid,
         likes: [],
         comments: [],
+        photoURL: auth.currentUser.photoURL,
+        displayName: auth.currentUser.displayName,
       })
       setOpenPostModal(false)
-      navigate('/userprofile?posts')
+      navigate('/userprofile?posts#postadded')
     } catch (err) {
       console.error(err.message)
     }
