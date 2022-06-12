@@ -41,6 +41,16 @@ const Post = ({ openPostModal, setOpenPostModal, postId }) => {
       likes: arrayUnion(auth.currentUser.uid),
     })
     setSubmitLikeLoading(false)
+    getPost()
+  }
+
+  const handleUnlike = async () => {
+    setSubmitLikeLoading(true)
+    await updateDoc(doc(db, 'posts', postId), {
+      likes: arrayRemove(auth.currentUser.uid),
+    })
+    setSubmitLikeLoading(false)
+    getPost()
   }
 
   const handleComment = async e => {
@@ -55,19 +65,12 @@ const Post = ({ openPostModal, setOpenPostModal, postId }) => {
     })
     setComment('')
     setSubmitCommentLoading(false)
-  }
-
-  const handleUnlike = async () => {
-    setSubmitLikeLoading(true)
-    await updateDoc(doc(db, 'posts', postId), {
-      likes: arrayRemove(auth.currentUser.uid),
-    })
-    setSubmitLikeLoading(false)
+    getPost()
   }
 
   useEffect(() => {
     if (postId) getPost()
-  }, [postId, handleLike, handleUnlike, handleComment])
+  }, [postId])
 
   useEffect(() => {
     if (comment) setSubmitCommentDisabled(false)

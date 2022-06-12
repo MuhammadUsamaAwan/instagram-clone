@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom'
 import emptyPost from '../../../assets/images/empty-post.jpg'
 import likes from '../../../assets/images/likes.png'
 import comments from '../../../assets/images/comments.png'
-import Posts from '../../../components/Post'
+import Post from '../../../components/Post'
 
 const UsersPosts = () => {
   const params = useParams()
@@ -94,7 +94,7 @@ const UsersPosts = () => {
             </div>
           </div>
         ))}
-        <Posts
+        <Post
           openPostModal={openPostModal}
           setOpenPostModal={setOpenPostModal}
           postId={post.id}

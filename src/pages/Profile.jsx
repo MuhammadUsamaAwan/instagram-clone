@@ -1,8 +1,14 @@
 import { useEffect, useState } from 'react'
-import { getDoc, doc } from 'firebase/firestore'
 import { useLocation, Link, useNavigate } from 'react-router-dom'
 import { auth, db } from '../config/firebase.config'
-import { collection, getDocs, query, where } from 'firebase/firestore'
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  getDoc,
+  doc,
+} from 'firebase/firestore'
 import avatar from '../assets/images/avatar.jpg'
 import { ReactComponent as Settings } from '../assets/icons/settings.svg'
 import { ReactComponent as PostsIcon } from '../assets/icons/posts-profile.svg'
