@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getDoc, doc } from 'firebase/firestore'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { collection, getDocs, query, where } from 'firebase/firestore'
 import { db } from '../config/firebase.config'
 import avatar from '../assets/images/avatar.jpg'
 import { ReactComponent as PostsIcon } from '../assets/icons/posts-profile.svg'
@@ -20,17 +21,25 @@ const UserProfile = () => {
   const params = useParams()
   const [user, setUser] = useState({})
   const [activeTab, setActiveTab] = useState('')
+  const [postCount, setPostCount] = useState(0)
 
   const getProfile = async () => {
     const docRef = doc(db, 'users', params.id)
     const docSnap = await getDoc(docRef)
     if (docSnap.exists()) {
       setUser(docSnap.data())
-      console.log(docSnap.data())
     }
   }
 
+  const getPosts = async () => {
+    const postsRef = collection(db, 'posts')
+    const q = query(postsRef, where('userRef', '==', params.id))
+    const querySnap = await getDocs(q)
+    setPostCount(querySnap.size)
+  }
+
   useEffect(() => {
+    getPosts()
     getProfile()
   }, [params])
 
@@ -65,7 +74,7 @@ const UserProfile = () => {
 
             <div className='flex space-x-6 text-base'>
               <div>
-                <span className='font-semibold mr-1'>0</span>posts
+                <span className='font-semibold mr-1'>{postCount}</span>posts
               </div>
               <div>
                 <span className='font-semibold mr-1'>0</span>followers
@@ -143,7 +152,7 @@ const UserProfile = () => {
         </div>
 
         {/* content */}
-        {activeTab === 'posts' && <UsersPost />}
+        {activeTab === 'posts' && <UsersPost setPostCount={setPostCount} />}
         {activeTab === 'videos' && <UsersVideos />}
         {activeTab === 'tagged' && <UsersTagged />}
       </div>

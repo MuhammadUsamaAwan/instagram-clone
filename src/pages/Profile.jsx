@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { getDoc, doc } from 'firebase/firestore'
 import { useLocation, Link, useNavigate } from 'react-router-dom'
 import { auth, db } from '../config/firebase.config'
+import { collection, getDocs, query, where } from 'firebase/firestore'
 import avatar from '../assets/images/avatar.jpg'
 import { ReactComponent as Settings } from '../assets/icons/settings.svg'
 import { ReactComponent as PostsIcon } from '../assets/icons/posts-profile.svg'
@@ -22,6 +23,7 @@ const Profile = () => {
   const [currentUser, setCurrentUser] = useState({})
   const [activeTab, setActiveTab] = useState('')
   const [openModal, setOpenModal] = useState(false)
+  const [postCount, setPostCount] = useState(0)
 
   const getProfile = async () => {
     const docRef = doc(db, 'users', auth.currentUser.uid)
@@ -31,8 +33,16 @@ const Profile = () => {
     }
   }
 
+  const getPosts = async () => {
+    const postsRef = collection(db, 'posts')
+    const q = query(postsRef, where('userRef', '==', auth.currentUser.uid))
+    const querySnap = await getDocs(q)
+    setPostCount(querySnap.size)
+  }
+
   useEffect(() => {
     getProfile()
+    getPosts()
   }, [])
 
   useEffect(() => {
@@ -164,7 +174,7 @@ const Profile = () => {
 
             <div className='flex space-x-6 text-base'>
               <div>
-                <span className='font-semibold mr-1'>0</span>posts
+                <span className='font-semibold mr-1'>{postCount}</span>posts
               </div>
               <div>
                 <span className='font-semibold mr-1'>0</span>followers
