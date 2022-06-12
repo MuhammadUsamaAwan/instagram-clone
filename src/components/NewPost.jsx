@@ -62,6 +62,8 @@ const NewPost = ({ openPostModal, setOpenPostModal }) => {
         caption,
         timestamp: serverTimestamp(),
         userRef: auth.currentUser.uid,
+        likes: [],
+        comments: [],
       })
       setOpenPostModal(false)
       navigate('/userprofile?posts')

@@ -28,13 +28,12 @@ const ProfilePosts = () => {
       })
     })
     setPosts(posts)
-    console.log(posts)
     setPostsLoading(false)
   }
 
   useEffect(() => {
-    getPosts()
-  }, [])
+    if (!openPostModal) getPosts()
+  }, [openPostModal])
 
   if (postsLoading) return <></>
 
@@ -65,7 +64,7 @@ const ProfilePosts = () => {
             key={post.id}
             className='relative cursor-pointer'
             onClick={() => {
-              setPost(post.data)
+              setPost(post)
               setOpenPostModal(true)
             }}
           >
@@ -80,7 +79,9 @@ const ProfilePosts = () => {
                   alt='likes'
                   className='w-[1.25rem] h-[1.25rem]'
                 />
-                <div className='font-semibold text-base text-white'>0</div>
+                <div className='font-semibold text-base text-white'>
+                  {post.data?.likes.length}
+                </div>
               </div>
               <div className='flex items-center space-x-[0.4375rem]'>
                 <img
@@ -88,7 +89,9 @@ const ProfilePosts = () => {
                   alt='comments'
                   className='w-[1.25rem] h-[1.25rem]'
                 />
-                <div className='font-semibold text-base text-white'>0</div>
+                <div className='font-semibold text-base text-white'>
+                  {post.data?.comments.length}
+                </div>
               </div>
             </div>
           </div>
@@ -96,12 +99,13 @@ const ProfilePosts = () => {
         <Posts
           openPostModal={openPostModal}
           setOpenPostModal={setOpenPostModal}
-          post={post}
+          post={post.data}
           userInfo={{
             displayName: auth.currentUser.displayName,
             photoURL: auth.currentUser.photoURL,
           }}
           isUser={false}
+          postId={post.id}
         />
       </div>
     )
