@@ -22,6 +22,8 @@ import ProfileSaved from './components/profile/ProfileSaved'
 import ProfileTagged from './components/profile/ProfileTagged'
 import PublicFooter from '../layouts/PublicFooter'
 import Modal from 'react-modal'
+import Followers from '../components/Followers'
+import Following from '../components/Following'
 
 const Profile = () => {
   const location = useLocation()
@@ -30,6 +32,8 @@ const Profile = () => {
   const [activeTab, setActiveTab] = useState('')
   const [openModal, setOpenModal] = useState(false)
   const [postCount, setPostCount] = useState(0)
+  const [openFollowersModal, setOpenFollowersModal] = useState(false)
+  const [openFollowingModal, setOpenFollowingModal] = useState(false)
 
   const getProfile = async () => {
     const docRef = doc(db, 'users', auth.currentUser.uid)
@@ -182,19 +186,37 @@ const Profile = () => {
               <div>
                 <span className='font-semibold mr-1'>{postCount}</span>posts
               </div>
-              <div>
+              <button
+                onClick={() => setOpenFollowersModal(true)}
+                disabled={!currentUser?.followers}
+              >
                 <span className='font-semibold mr-1'>
                   {currentUser?.followers ? currentUser?.followers.length : 0}
                 </span>
                 followers
-              </div>
-              <div>
+              </button>
+              <button
+                onClick={() => setOpenFollowingModal(true)}
+                disabled={!currentUser?.following}
+              >
                 <span className='font-semibold mr-1'>
                   {currentUser?.following ? currentUser?.following.length : 0}
                 </span>
                 following
-              </div>
+              </button>
             </div>
+
+            {/* modals */}
+            <Followers
+              openFollowersModal={openFollowersModal}
+              setOpenFollowersModal={setOpenFollowersModal}
+              userId={auth.currentUser.uid}
+            />
+            <Following
+              openFollowingModal={openFollowingModal}
+              setOpenFollowingModal={setOpenFollowingModal}
+              userId={auth.currentUser.uid}
+            />
 
             <div className='text-base'>
               <div className='font-semibold'>{currentUser?.name}</div>

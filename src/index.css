@@ -27,3 +27,7 @@
 .post-comment::-webkit-scrollbar {
     display: none;
 }
+
+.scroll-hidden::-webkit-scrollbar {
+    display: none;
+}
