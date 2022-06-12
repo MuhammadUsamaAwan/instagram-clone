@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import Modal from 'react-modal'
 import avatar from '../assets/images/avatar.jpg'
+import { useNavigate } from 'react-router-dom'
 import { ReactComponent as Like } from '../assets/icons/notliked.svg'
 import { ReactComponent as Unlike } from '../assets/icons/liked.svg'
 import { ReactComponent as Comment } from '../assets/icons/commentpost.svg'
@@ -17,6 +18,7 @@ import { auth, db } from '../config/firebase.config'
 import moment from 'moment'
 
 const Post = ({ openPostModal, setOpenPostModal, postId }) => {
+  const navigate = useNavigate()
   const [postData, setPostData] = useState()
   const [submitLikeLoading, setSubmitLikeLoading] = useState(false)
   const [comment, setComment] = useState('')
@@ -103,7 +105,13 @@ const Post = ({ openPostModal, setOpenPostModal, postId }) => {
         {/* post info */}
         <div className='w-1/2 sm:w-[35%] flex flex-col'>
           {/* user info */}
-          <div className='flex items-center space-x-3 mb-2 px-4 pt-3.5'>
+          <div
+            className='flex items-center space-x-3 mb-2 px-4 pt-3.5 cursor-pointer'
+            onClick={() => {
+              setOpenPostModal(false)
+              navigate(`/users/${postData?.userRef}`)
+            }}
+          >
             <div className='w-8 h-8 overflow-hidden rounded-full flex'>
               <img
                 src={postData?.photoURL ? postData?.photoURL : avatar}
@@ -111,11 +119,6 @@ const Post = ({ openPostModal, setOpenPostModal, postId }) => {
               />
             </div>
             <div className='font-semibold'>{postData?.displayName}</div>
-            {postData?.userRef !== auth.currentUser.uid && (
-              <button className='text-vividcerulean font-semibold'>
-                Follow
-              </button>
-            )}
           </div>
           <p className='px-4 border-b border-gainsboro pb-3.5'>
             {postData?.caption}

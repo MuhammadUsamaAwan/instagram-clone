@@ -1,8 +1,17 @@
 import { useEffect, useState } from 'react'
-import { getDoc, doc } from 'firebase/firestore'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
-import { collection, getDocs, query, where } from 'firebase/firestore'
-import { db } from '../config/firebase.config'
+import {
+  collection,
+  getDocs,
+  getDoc,
+  doc,
+  query,
+  where,
+  arrayRemove,
+  arrayUnion,
+  updateDoc,
+} from 'firebase/firestore'
+import { auth, db } from '../config/firebase.config'
 import avatar from '../assets/images/avatar.jpg'
 import { ReactComponent as PostsIcon } from '../assets/icons/posts-profile.svg'
 import { ReactComponent as PostsActiveIcon } from '../assets/icons/posts-profile-active.svg'
@@ -10,10 +19,12 @@ import { ReactComponent as VideosIcon } from '../assets/icons/videos.svg'
 import { ReactComponent as VideosActiveIcon } from '../assets/icons/videos-active.svg'
 import { ReactComponent as TaggedIcon } from '../assets/icons/tagged.svg'
 import { ReactComponent as TaggedActiveIcon } from '../assets/icons/tagged-active.svg'
+import { ReactComponent as FollowingIcon } from '../assets/icons/following.svg'
 import PublicFooter from '../layouts/PublicFooter'
 import UsersPost from './components/users/UsersPost'
 import UsersVideos from './components/users/UsersVideos'
 import UsersTagged from './components/users/UsersTagged'
+import Modal from 'react-modal'
 
 const UserProfile = () => {
   const location = useLocation()
@@ -22,6 +33,7 @@ const UserProfile = () => {
   const [user, setUser] = useState({})
   const [activeTab, setActiveTab] = useState('')
   const [postCount, setPostCount] = useState(0)
+  const [openUnfollowModal, setOpenUnfollowModal] = useState(false)
 
   const getProfile = async () => {
     const docRef = doc(db, 'users', params.id)
@@ -38,14 +50,33 @@ const UserProfile = () => {
     setPostCount(querySnap.size)
   }
 
+  const handleUnfollow = async () => {
+    setOpenUnfollowModal(false)
+    await updateDoc(doc(db, 'users', params.id), {
+      followers: arrayRemove(auth.currentUser.uid),
+    })
+  }
+
+  const handleFollow = async () => {
+    await updateDoc(doc(db, 'users', params.id), {
+      followers: arrayUnion(auth.currentUser.uid),
+    })
+  }
+
   useEffect(() => {
     getPosts()
     getProfile()
   }, [params])
 
   useEffect(() => {
+    getProfile()
+  }, [handleUnfollow, handleFollow])
+
+  useEffect(() => {
     setActiveTab(location.search.slice(1) ? location.search.slice(1) : 'posts')
   }, [location])
+
+  Modal.setAppElement(document.getElementById('root'))
 
   return (
     <section className='grid place-content-center'>
@@ -66,9 +97,67 @@ const UserProfile = () => {
             <div>
               <div className='flex items-center space-x-6'>
                 <h2 className='text-[1.75rem] font-light'>{user.userName}</h2>
-                <button className='font-semibold rounded bg-vividcerulean text-white py-[0.3125rem] px-[0.5625rem]'>
-                  Follow
-                </button>
+                {user?.followers?.includes(auth.currentUser.uid) ? (
+                  <div className='flex space-x-1'>
+                    <button className='font-semibold rounded border border-gainsboro py-[0.3125rem] px-[0.5625rem]'>
+                      Message
+                    </button>
+                    <button
+                      className='border border-gainsboro py-[0.3125rem] px-[0.5625rem] rounded'
+                      onClick={() => setOpenUnfollowModal(true)}
+                    >
+                      <FollowingIcon />
+                    </button>
+                    <Modal
+                      isOpen={openUnfollowModal}
+                      closeTimeoutMS={100}
+                      onRequestClose={() => setOpenUnfollowModal(false)}
+                      style={{
+                        overlay: {
+                          backgroundColor: 'rgba(0, 0, 0, 0.65)',
+                        },
+                        content: {
+                          border: 0,
+                          borderRadius: '0.75rem',
+                          width: 'fit-content',
+                          height: 'fit-content',
+                          top: '50%',
+                          left: '50%',
+                          transform: 'translate(-50%, -50%)',
+                          padding: 0,
+                        },
+                      }}
+                    >
+                      <div className='flex flex-col text-center items-center w-[25rem]'>
+                        <img
+                          src={user.photoURL ? user.photoURL : avatar}
+                          className='w-[5.625rem] h-[5.625rem] rounded-full object-cover m-8'
+                          alt='avatar'
+                        />
+                        <div className='mb-8'>Unfollow @{user?.userName}?</div>
+                        <button
+                          className='font-semibold text-desire p-3.5 border-t border-gainsboro w-full'
+                          onClick={handleUnfollow}
+                        >
+                          Unfollow
+                        </button>
+                        <button
+                          className='p-3.5 border-t border-gainsboro w-full'
+                          onClick={() => setOpenUnfollowModal(false)}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </Modal>
+                  </div>
+                ) : (
+                  <button
+                    className='font-semibold rounded bg-vividcerulean text-white py-[0.3125rem] px-[0.5625rem]'
+                    onClick={handleFollow}
+                  >
+                    Follow
+                  </button>
+                )}
               </div>
             </div>
 
@@ -77,7 +166,10 @@ const UserProfile = () => {
                 <span className='font-semibold mr-1'>{postCount}</span>posts
               </div>
               <div>
-                <span className='font-semibold mr-1'>0</span>followers
+                <span className='font-semibold mr-1'>
+                  {user?.followers ? user?.followers.length : 0}
+                </span>
+                followers
               </div>
               <div>
                 <span className='font-semibold mr-1'>0</span>following
