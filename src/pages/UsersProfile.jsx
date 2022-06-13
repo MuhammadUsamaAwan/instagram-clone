@@ -12,7 +12,6 @@ import {
   updateDoc,
 } from 'firebase/firestore'
 import { auth, db } from '../config/firebase.config'
-import avatar from '../assets/images/avatar.jpg'
 import { ReactComponent as PostsIcon } from '../assets/icons/posts-profile.svg'
 import { ReactComponent as PostsActiveIcon } from '../assets/icons/posts-profile-active.svg'
 import { ReactComponent as VideosIcon } from '../assets/icons/videos.svg'
@@ -25,6 +24,8 @@ import UsersPost from './components/users/UsersPost'
 import UsersVideos from './components/users/UsersVideos'
 import UsersTagged from './components/users/UsersTagged'
 import Modal from 'react-modal'
+import Followers from '../components/Followers'
+import Following from '../components/Following'
 
 const UserProfile = () => {
   const location = useLocation()
@@ -34,6 +35,8 @@ const UserProfile = () => {
   const [activeTab, setActiveTab] = useState('')
   const [postCount, setPostCount] = useState(0)
   const [openUnfollowModal, setOpenUnfollowModal] = useState(false)
+  const [openFollowersModal, setOpenFollowersModal] = useState(false)
+  const [openFollowingModal, setOpenFollowingModal] = useState(false)
 
   const getProfile = async () => {
     const docRef = doc(db, 'users', params.id)
@@ -91,11 +94,7 @@ const UserProfile = () => {
         <div className='flex items-center'>
           <div className='flex-1'>
             <div className='h-[4.6875rem] sm:h-[9.375rem] w-[4.6875rem] sm:w-[9.375rem] rounded-full overflow-hidden flex ml-0 sm:ml-14'>
-              <img
-                src={user.photoURL ? user.photoURL : avatar}
-                alt='avatar'
-                loading='lazy'
-              />
+              <img src={user.photoURL} alt='avatar' loading='lazy' />
             </div>
           </div>
 
@@ -136,7 +135,7 @@ const UserProfile = () => {
                     >
                       <div className='flex flex-col text-center items-center w-[25rem]'>
                         <img
-                          src={user.photoURL ? user.photoURL : avatar}
+                          src={user.photoURL}
                           className='w-[5.625rem] h-[5.625rem] rounded-full object-cover m-8'
                           alt='avatar'
                         />
@@ -171,19 +170,37 @@ const UserProfile = () => {
               <div>
                 <span className='font-semibold mr-1'>{postCount}</span>posts
               </div>
-              <div>
+              <button
+                onClick={() => setOpenFollowersModal(true)}
+                disabled={!user?.followers}
+              >
                 <span className='font-semibold mr-1'>
                   {user?.followers ? user?.followers.length : 0}
                 </span>
                 followers
-              </div>
-              <div>
+              </button>
+              <button
+                onClick={() => setOpenFollowingModal(true)}
+                disabled={!user?.following}
+              >
                 <span className='font-semibold mr-1'>
                   {user?.following ? user?.following.length : 0}
                 </span>
                 following
-              </div>
+              </button>
             </div>
+
+            {/* modals */}
+            <Followers
+              openFollowersModal={openFollowersModal}
+              setOpenFollowersModal={setOpenFollowersModal}
+              userId={params.id}
+            />
+            <Following
+              openFollowingModal={openFollowingModal}
+              setOpenFollowingModal={setOpenFollowingModal}
+              userId={params.id}
+            />
 
             <div className='text-base'>
               <div className='font-semibold'>{user.name}</div>

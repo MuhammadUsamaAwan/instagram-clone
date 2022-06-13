@@ -1,35 +1,41 @@
 import { useEffect, useState } from 'react'
 import Modal from 'react-modal'
 import { Link } from 'react-router-dom'
+import { getDoc, doc } from 'firebase/firestore'
 import { db } from '../config/firebase.config'
-import { collection, getDocs, query, where } from 'firebase/firestore'
 
-const Followers = ({ openFollowersModal, setOpenFollowersModal, userId }) => {
-  const [followers, setFollowers] = useState([])
+const Likes = ({ openLikesModal, setOpenLikesModal, userIds }) => {
+  const [likes, setLikes] = useState([])
+  let isMounted = false
 
   Modal.setAppElement(document.getElementById('root'))
 
-  const getFollowers = async () => {
-    const usersRef = collection(db, 'users')
-    const q = query(usersRef, where('following', 'array-contains', userId))
-    const querySnap = await getDocs(q)
-    const users = []
-    querySnap.forEach(doc => {
-      return users.push({
-        id: doc.id,
-        data: doc.data(),
-      })
+  const getLikes = async () => {
+    userIds.forEach(async user => {
+      const docRef = doc(db, 'users', user)
+      const docSnap = await getDoc(docRef)
+      if (docSnap.exists())
+        setLikes(likes => [
+          ...likes,
+          {
+            userRef: user,
+            userName: docSnap.data().userName,
+            photoURL: docSnap.data().photoURL,
+          },
+        ])
     })
-    setFollowers(users)
+    isMounted = true
   }
+
   useEffect(() => {
-    if (openFollowersModal) getFollowers()
-  }, [openFollowersModal])
+    if (!isMounted) getLikes()
+  }, [])
+
   return (
     <Modal
-      isOpen={openFollowersModal}
+      isOpen={openLikesModal}
       closeTimeoutMS={100}
-      onRequestClose={() => setOpenFollowersModal(false)}
+      onRequestClose={() => setOpenLikesModal(false)}
       style={{
         overlay: {
           backgroundColor: 'rgba(0, 0, 0, 0.65)',
@@ -48,21 +54,21 @@ const Followers = ({ openFollowersModal, setOpenFollowersModal, userId }) => {
     >
       <div className='w-[16.25rem] max-h-[25rem] sm:w-[25rem] overflow-y-scroll scroll-hidden'>
         <div className='text-center text-base font-semibold py-2 border-b border-gainsboro'>
-          Followers
+          Likes
         </div>
         <div className='space-y-2 my-2 px-4'>
-          {followers?.map(follower => (
+          {likes?.map(like => (
             <Link
-              to={`/users/${follower?.id}`}
-              key={follower?.id}
+              to={`/users/${like?.userRef}`}
+              key={like?.userRef}
               className='flex items-center space-x-4'
             >
               <img
-                src={follower?.data?.photoURL}
+                src={like?.photoURL}
                 alt='avatar'
                 className='h-[1.875rem] w-[1.875rem] rounded-full object-cover'
               />
-              <div>{follower?.data?.userName}</div>
+              <div>{like?.userName}</div>
             </Link>
           ))}
         </div>
@@ -71,4 +77,4 @@ const Followers = ({ openFollowersModal, setOpenFollowersModal, userId }) => {
   )
 }
 
-export default Followers
+export default Likes

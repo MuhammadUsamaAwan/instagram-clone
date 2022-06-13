@@ -4,7 +4,6 @@ import { serverTimestamp, addDoc, collection } from 'firebase/firestore'
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage'
 import { v4 as uuidv4 } from 'uuid'
 import { auth, db } from '..//config/firebase.config'
-import avatar from '../assets/images/avatar.jpg'
 import { ReactComponent as NewPostIcon } from '../assets/icons/newpost.svg'
 import { ReactComponent as ErrorIcon } from '../assets/icons/error.svg'
 import { ReactComponent as LeftArrow } from '../assets/icons/left-arrow.svg'
@@ -64,8 +63,6 @@ const NewPost = ({ openPostModal, setOpenPostModal }) => {
         userRef: auth.currentUser.uid,
         likes: [],
         comments: [],
-        photoURL: auth.currentUser.photoURL,
-        displayName: auth.currentUser.displayName,
       })
       setOpenPostModal(false)
       navigate('/userprofile?posts#postadded')
@@ -149,14 +146,7 @@ const NewPost = ({ openPostModal, setOpenPostModal }) => {
               <div className='absolute top-4 left-0 px-4 w-full'>
                 <div className='flex items-center space-x-3 mb-2'>
                   <div className='w-[1.75rem] h-[1.75rem] overflow-hidden rounded-full flex'>
-                    <img
-                      src={
-                        auth.currentUser.photoURL
-                          ? auth.currentUser.photoURL
-                          : avatar
-                      }
-                      alt='profile'
-                    />
+                    <img src={auth.currentUser.photoURL} alt='profile' />
                   </div>
                   <div className='text-base font-semibold'>
                     {auth.currentUser.displayName}

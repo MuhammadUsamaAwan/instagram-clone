@@ -8,7 +8,6 @@ import {
 } from 'firebase/firestore'
 import { auth, db } from '../../../config/firebase.config'
 import { Link } from 'react-router-dom'
-import avatar from '../../../assets/images/avatar.jpg'
 import { useEventListener } from '../../../hooks/useEventListener'
 import { ReactComponent as Like } from '../../../assets/icons/notliked.svg'
 import { ReactComponent as Unlike } from '../../../assets/icons/liked.svg'
@@ -17,6 +16,7 @@ import { ReactComponent as Share } from '../../../assets/icons/share.svg'
 import { ReactComponent as Saved } from '../../../assets/icons/savedpost.svg'
 import moment from 'moment'
 import Post from '../../../components/Post'
+import Likes from '../../../components/Likes'
 
 const HomePost = ({ id, data }) => {
   const [submitLikeLoading, setSubmitLikeLoading] = useState(false)
@@ -24,14 +24,17 @@ const HomePost = ({ id, data }) => {
   const [submitCommentLoading, setSubmitCommentLoading] = useState(false)
   const [submitCommentDisabled, setSubmitCommentDisabled] = useState(true)
   const [postData, setPostData] = useState(data)
+  const [userData, setUserData] = useState()
   const [openPostModal, setOpenPostModal] = useState(false)
+  const [openLikesModal, setOpenLikesModal] = useState(false)
 
   const getPost = async () => {
-    const docRef = doc(db, 'posts', id)
-    const docSnap = await getDoc(docRef)
-    if (docSnap.exists()) {
-      setPostData(docSnap.data())
-    }
+    let docRef = doc(db, 'posts', id)
+    let docSnap = await getDoc(docRef)
+    if (docSnap.exists()) setPostData(docSnap.data())
+    docRef = doc(db, 'users', docSnap.data().userRef)
+    docSnap = await getDoc(docRef)
+    if (docSnap.exists()) setUserData(docSnap.data())
   }
 
   const handleLike = async () => {
@@ -58,8 +61,7 @@ const HomePost = ({ id, data }) => {
     await updateDoc(doc(db, 'posts', id), {
       comments: arrayUnion({
         comment,
-        userName: auth.currentUser.displayName,
-        photoURL: auth.currentUser.photoURL,
+        userRef: auth.currentUser.uid,
       }),
     })
     setComment('')
@@ -75,6 +77,10 @@ const HomePost = ({ id, data }) => {
   )
 
   useEffect(() => {
+    if (!openPostModal) getPost()
+  }, [openPostModal])
+
+  useEffect(() => {
     if (comment) setSubmitCommentDisabled(false)
     else setSubmitCommentDisabled(true)
   }, [comment])
@@ -87,11 +93,11 @@ const HomePost = ({ id, data }) => {
         className='flex items-center space-x-2 border-t border-l border-r border-gainsboro p-2 rounded-tr-md rounded-tl-md'
       >
         <img
-          src={postData?.photoURL ? postData.photoURL : avatar}
+          src={userData?.photoURL}
           alt='avatar'
           className='h-8 w-8 object-cover rounded-full mb-1'
         />
-        <h1 className='font-semibold'>{postData?.displayName}</h1>
+        <h1 className='font-semibold'>{userData?.userName}</h1>
       </Link>
       {/* post img */}
       <img
@@ -120,9 +126,19 @@ const HomePost = ({ id, data }) => {
           <Saved />
         </div>
         {/* likes */}
-        <div className='font-semibold py-2.5 px-2.5'>
+        <button
+          className='font-semibold py-2.5 px-2.5'
+          onClick={() => setOpenLikesModal(true)}
+          disabled={postData?.likes.length === 0}
+        >
           {postData?.likes ? postData?.likes.length : 0} likes
-        </div>
+        </button>
+        {/* likes modal */}
+        <Likes
+          openLikesModal={openLikesModal}
+          setOpenLikesModal={setOpenLikesModal}
+          userIds={postData?.likes ? postData?.likes : []}
+        />
         {/* caption */}
         <p className='px-2.5'>
           <span className='mr-1 font-semibold'>{postData?.displayName}</span>
@@ -148,6 +164,8 @@ const HomePost = ({ id, data }) => {
             id='comment'
             placeholder='Add a comment...'
             className='flex-1 py-3.5 outline-0 bg-transparent'
+            value={comment}
+            onChange={e => setComment(e.target.value)}
             maxLength='20'
           />
           <button

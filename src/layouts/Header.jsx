@@ -6,7 +6,6 @@ import { useOutsideClick } from '../hooks/useOutsideClick'
 import { useDebounce } from '../hooks/useDebounce'
 import logo from '../assets/images/nav-logo.png'
 import clear from '../assets/images/clear.png'
-import avatar from '../assets/images/avatar.jpg'
 import { ReactComponent as Home } from '../assets/icons/home.svg'
 import { ReactComponent as HomeActive } from '../assets/icons/home-active.svg'
 import { ReactComponent as DM } from '../assets/icons/dm.svg'
@@ -139,12 +138,7 @@ const Header = () => {
                       key={result.id}
                     >
                       <div className='w-11 h-11 overflow-hidden rounded-full flex'>
-                        <img
-                          src={
-                            result.data.photoURL ? result.data.photoURL : avatar
-                          }
-                          alt='profile'
-                        />
+                        <img src={result.data.photoURL} alt='profile' />
                       </div>
                       <div className='ml-4 leading-[1.125rem]'>
                         <div className='font-semibold'>
@@ -193,12 +187,7 @@ const Header = () => {
             onClick={handleProfileClick}
           >
             <div className='w-6 h-6 overflow-hidden rounded-full flex'>
-              <img
-                src={
-                  auth.currentUser.photoURL ? auth.currentUser.photoURL : avatar
-                }
-                alt='profile'
-              />
+              <img src={auth.currentUser.photoURL} alt='profile' />
             </div>
             {activeLink === 'profile' && (
               <>

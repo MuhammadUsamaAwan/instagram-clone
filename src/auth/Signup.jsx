@@ -88,12 +88,16 @@ const Signup = () => {
       const user = userCredential.user
       updateProfile(auth.currentUser, {
         displayName: userName,
+        photoURL:
+          'https://firebasestorage.googleapis.com/v0/b/instagram-clone-4b1c1.appspot.com/o/static%2Favatar.jpg?alt=media&token=3fcf5e77-635c-484c-9bf9-35458d5a3f58',
       })
       const data = {
         email,
         name,
         userName,
         timestamp: serverTimestamp(),
+        photoURL:
+          'https://firebasestorage.googleapis.com/v0/b/instagram-clone-4b1c1.appspot.com/o/static%2Favatar.jpg?alt=media&token=3fcf5e77-635c-484c-9bf9-35458d5a3f58',
       }
       await setDoc(doc(db, 'users', user.uid), data)
     } catch (err) {

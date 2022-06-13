@@ -1,7 +1,6 @@
 import { useEffect, useState, useMemo } from 'react'
 import { updatePassword } from 'firebase/auth'
 import { auth } from '../../../config/firebase.config'
-import avatar from '../../../assets/images/avatar.jpg'
 
 const ChangePassword = () => {
   const [newPassword, setNewPassword] = useState('')
@@ -47,13 +46,7 @@ const ChangePassword = () => {
       <div className='flex items-center justify-center mb-4'>
         <div className='flex flex-1 justify-end'>
           <div className='rounded-full overflow-hidden flex items-center justify-center h-[2.625rem] w-[2.625rem]'>
-            <img
-              src={
-                auth.currentUser.photoURL ? auth.currentUser.photoURL : avatar
-              }
-              alt='avatar'
-              loading='lazy'
-            />
+            <img src={auth.currentUser.photoURL} alt='avatar' loading='lazy' />
           </div>
         </div>
         <div className='flex-[4] ml-8'>

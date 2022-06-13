@@ -9,7 +9,6 @@ import {
   getDoc,
   doc,
 } from 'firebase/firestore'
-import avatar from '../assets/images/avatar.jpg'
 import { ReactComponent as Settings } from '../assets/icons/settings.svg'
 import { ReactComponent as PostsIcon } from '../assets/icons/posts-profile.svg'
 import { ReactComponent as PostsActiveIcon } from '../assets/icons/posts-profile-active.svg'
@@ -69,9 +68,7 @@ const Profile = () => {
           <div className='flex-1'>
             <div className='h-[4.6875rem] sm:h-[9.375rem] w-[4.6875rem] sm:w-[9.375rem] rounded-full overflow-hidden flex ml-0 sm:ml-14'>
               <img
-                src={
-                  auth.currentUser.photoURL ? auth.currentUser.photoURL : avatar
-                }
+                src={auth.currentUser.photoURL}
                 alt='avatar'
                 loading='lazy'
               />

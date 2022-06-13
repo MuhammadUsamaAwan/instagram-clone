@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { auth, db } from '../config/firebase.config'
-import avatar from '../assets/images/avatar.jpg'
 import {
   collection,
   getDocs,
@@ -12,6 +11,7 @@ import {
 import { Link } from 'react-router-dom'
 import HomePost from './components/home/HomePost'
 import HomeFooter from './components/home/HomeFooter'
+import seen from '../assets/images/seen.png'
 
 const Home = () => {
   const [currentUser, setCurrentUser] = useState({})
@@ -52,13 +52,20 @@ const Home = () => {
           {posts.map(post => (
             <HomePost key={post.id} id={post.id} data={post.data} />
           ))}
+          <div
+            className='flex flex-col items-center space-y-3'
+            style={{ margin: '3rem 0' }}
+          >
+            <img src={seen} alt='seen' />
+            <p>
+              You've seen all posts. Follow more accounts to see more posts!
+            </p>
+          </div>
         </div>
         <div className='md:hidden hidden flex-[2] lg:block'>
           <Link to='/userprofile' className='space-x-4 items-center flex'>
             <img
-              src={
-                auth.currentUser.photoURL ? auth.currentUser.photoURL : avatar
-              }
+              src={auth.currentUser.photoURL}
               alt='avatar'
               className='rounded-full object-cover h-[3.5rem] 2-[3.5rem]'
             />

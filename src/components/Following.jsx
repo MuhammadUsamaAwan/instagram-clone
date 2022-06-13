@@ -3,7 +3,6 @@ import Modal from 'react-modal'
 import { Link } from 'react-router-dom'
 import { db } from '../config/firebase.config'
 import { collection, getDocs, query, where } from 'firebase/firestore'
-import avatar from '../assets/images/avatar.jpg'
 
 const Following = ({ openFollowingModal, setOpenFollowingModal, userId }) => {
   const [following, setFollowing] = useState([])
@@ -21,7 +20,6 @@ const Following = ({ openFollowingModal, setOpenFollowingModal, userId }) => {
         data: doc.data(),
       })
     })
-    console.log(users)
     setFollowing(users)
   }
   useEffect(() => {
@@ -60,9 +58,7 @@ const Following = ({ openFollowingModal, setOpenFollowingModal, userId }) => {
               className='flex items-center space-x-4'
             >
               <img
-                src={
-                  following?.data?.photoURL ? following?.data?.photoURL : avatar
-                }
+                src={following?.data?.photoURL}
                 alt='avatar'
                 className='h-[1.875rem] w-[1.875rem] rounded-full object-cover'
               />

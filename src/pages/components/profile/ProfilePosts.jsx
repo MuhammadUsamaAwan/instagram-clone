@@ -82,7 +82,7 @@ const ProfilePosts = () => {
                   className='w-[1.25rem] h-[1.25rem]'
                 />
                 <div className='font-semibold text-base text-white'>
-                  {post.data?.likes.length}
+                  {post.data?.likes ? post.data?.likes?.length : 0}
                 </div>
               </div>
               <div className='flex items-center space-x-[0.4375rem]'>
@@ -92,7 +92,7 @@ const ProfilePosts = () => {
                   className='w-[1.25rem] h-[1.25rem]'
                 />
                 <div className='font-semibold text-base text-white'>
-                  {post.data?.comments.length}
+                  {post.data?.comments ? post.data?.comments?.length : 0}
                 </div>
               </div>
             </div>

@@ -4,7 +4,6 @@ import { updateProfile } from 'firebase/auth'
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage'
 import { v4 as uuidv4 } from 'uuid'
 import { auth, db } from '../../../config/firebase.config'
-import avatar from '../../../assets/images/avatar.jpg'
 
 const ProfileEdit = () => {
   const [name, setName] = useState('')
@@ -15,9 +14,7 @@ const ProfileEdit = () => {
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [photoUploadLoading, setPhotoUploadLoading] = useState(false)
   const [photoUploadError, setPhotoUploadError] = useState(false)
-  const [profilePhoto, setProfilePhoto] = useState(
-    auth.currentUser.photoURL ? auth.currentUser.photoURL : avatar
-  )
+  const [profilePhoto, setProfilePhoto] = useState(auth.currentUser.photoURL)
 
   const getProfile = async () => {
     const docRef = doc(db, 'users', auth.currentUser.uid)

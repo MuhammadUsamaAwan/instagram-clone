@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import Modal from 'react-modal'
-import avatar from '../assets/images/avatar.jpg'
 import { useNavigate } from 'react-router-dom'
 import { ReactComponent as Like } from '../assets/icons/notliked.svg'
 import { ReactComponent as Unlike } from '../assets/icons/liked.svg'
@@ -16,21 +15,28 @@ import {
 } from 'firebase/firestore'
 import { auth, db } from '../config/firebase.config'
 import moment from 'moment'
+import Comments from './Comments'
 
 const Post = ({ openPostModal, setOpenPostModal, postId }) => {
   const navigate = useNavigate()
-  const [postData, setPostData] = useState()
+  const [loading, setLoading] = useState(true)
+  const [postData, setPostData] = useState(null)
+  const [userData, setUserData] = useState(null)
   const [submitLikeLoading, setSubmitLikeLoading] = useState(false)
   const [comment, setComment] = useState('')
   const [submitCommentLoading, setSubmitCommentLoading] = useState(false)
   const [submitCommentDisabled, setSubmitCommentDisabled] = useState(true)
 
   const getPost = async () => {
-    const docRef = doc(db, 'posts', postId)
-    const docSnap = await getDoc(docRef)
+    let docRef = doc(db, 'posts', postId)
+    let docSnap = await getDoc(docRef)
     if (docSnap.exists()) {
       setPostData(docSnap.data())
+      docRef = doc(db, 'users', docSnap.data().userRef)
+      docSnap = await getDoc(docRef)
+      if (docSnap.exists()) setUserData(docSnap.data())
     }
+    setLoading(false)
   }
 
   Modal.setAppElement(document.getElementById('root'))
@@ -59,8 +65,7 @@ const Post = ({ openPostModal, setOpenPostModal, postId }) => {
     await updateDoc(doc(db, 'posts', postId), {
       comments: arrayUnion({
         comment,
-        userName: auth.currentUser.displayName,
-        photoURL: auth.currentUser.photoURL,
+        userRef: auth.currentUser.uid,
       }),
     })
     setComment('')
@@ -69,14 +74,16 @@ const Post = ({ openPostModal, setOpenPostModal, postId }) => {
   }
 
   useEffect(() => {
-    if (postId) getPost()
-  }, [postId])
+    if (openPostModal) getPost()
+    return () => setPostData()
+  }, [openPostModal])
 
   useEffect(() => {
     if (comment) setSubmitCommentDisabled(false)
     else setSubmitCommentDisabled(true)
   }, [comment])
 
+  if (loading) return <></>
   return (
     <Modal
       isOpen={openPostModal}
@@ -116,36 +123,14 @@ const Post = ({ openPostModal, setOpenPostModal, postId }) => {
             }}
           >
             <div className='w-8 h-8 overflow-hidden rounded-full flex'>
-              <img
-                src={postData?.photoURL ? postData?.photoURL : avatar}
-                alt='profile'
-              />
+              <img src={userData?.photoURL} alt='profile' />
             </div>
-            <div className='font-semibold'>{postData?.displayName}</div>
+            <div className='font-semibold'>{userData?.userName}</div>
           </div>
           <p className='px-4 border-b border-gainsboro pb-3.5'>
             {postData?.caption}
           </p>
-          {/* comments */}
-          {postData?.comments.length !== 0 ? (
-            <div className='flex-1 px-4 py-3.5 overflow-scroll post-comment'>
-              {postData?.comments.map(comment => (
-                <div key={comment?.comment} className='mb-4 flex space-x-3'>
-                  <img
-                    src={comment?.photoURL ? comment?.photoURL : avatar}
-                    alt='profile'
-                    className='w-8 h-8 rounded-full object-cover'
-                  />
-                  <div className='font-semibold'>
-                    {comment?.userName}
-                    <span className='ml-1 font-normal'>{comment?.comment}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className='flex-1 px-4 py-3.5'>No comments yet...</div>
-          )}
+          <Comments comments={postData?.comments} />
           {/* actions */}
           <div className='px-4 flex items-center justify-between py-3.5 border-t border-gainsboro'>
             <div className='flex items-center space-x-4'>
@@ -179,7 +164,7 @@ const Post = ({ openPostModal, setOpenPostModal, postId }) => {
               className='flex-1 py-3.5 outline-0'
               value={comment}
               onChange={e => setComment(e.target.value)}
-              maxLength='20'
+              maxLength='30'
             />
             <button
               className={`${
