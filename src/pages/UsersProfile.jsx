@@ -104,7 +104,10 @@ const UserProfile = () => {
                 <h2 className='text-[1.75rem] font-light'>{user.userName}</h2>
                 {user?.followers?.includes(auth.currentUser.uid) ? (
                   <div className='flex space-x-1'>
-                    <button className='font-semibold rounded border border-gainsboro py-[0.3125rem] px-[0.5625rem]'>
+                    <button
+                      className='font-semibold rounded border border-gainsboro py-[0.3125rem] px-[0.5625rem]'
+                      onClick={() => navigate('/dm')}
+                    >
                       Message
                     </button>
                     <button
