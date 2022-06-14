@@ -26,7 +26,7 @@ const DM = () => {
         {/* right content */}
         <div className='w-[62%]'>
           {/* chat user header */}
-          <div className='flex items-center px-8 py-[1.1rem] border-b border-gainsboro space-x-2'>
+          <div className='flex items-center px-8 py-[1.1rem] border-b border-gainsboro space-x-4'>
             <img
               src={auth.currentUser.photoURL}
               alt='avatar'
@@ -37,7 +37,27 @@ const DM = () => {
             </div>
           </div>
           {/* chat */}
-
+          <div className='overflow-y-scroll scroll-hidden p-4 space-y-2'>
+            {/* incomming */}
+            <div className='flex space-x-2 items-end'>
+              <img
+                src={auth.currentUser.photoURL}
+                alt='avatar'
+                className='h-[1.5rem] w-[1.5rem] object-cover rounded-full mb-2'
+              />
+              <div className='border border-gainsboro rounded-[1.375rem] px-4 py-2 max-w-[50%]'>
+                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Iste,
+                odio.
+              </div>
+            </div>
+            {/* outgoing */}
+            <div className='flex space-x-2 items-end justify-end'>
+              <div className='border border-gainsboro rounded-[1.375rem] px-4 py-2 max-w-[50%]'>
+                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Iste,
+                odio.
+              </div>
+            </div>
+          </div>
           {/* new message */}
         </div>
       </div>
