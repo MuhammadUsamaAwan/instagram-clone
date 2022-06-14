@@ -8,6 +8,7 @@ import Home from '../pages/Home'
 import Profile from '../pages/Profile'
 import EditProfile from '../pages/EditProfile'
 import UsersProfile from '../pages/UsersProfile'
+import DM from '../pages/DM'
 
 const AppRoutes = () => {
   return (
@@ -23,6 +24,7 @@ const AppRoutes = () => {
           <Route path='/userprofile' element={<Profile />} />
           <Route path='/editprofile' element={<EditProfile />} />
           <Route path='/users/:id' element={<UsersProfile />} />
+          <Route path='/dm' element={<DM />} />
         </Route>
       </Routes>
     </Router>

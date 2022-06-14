@@ -105,6 +105,7 @@ const HomePost = ({ id, data }) => {
         src={postData?.image}
         alt='post'
         className='h-[29.375rem] w-full sm:w-[29.375rem] object-cover cursor-pointer'
+        loading='lazy'
       />
       {/* post info */}
       <div className='border-b border-l border-r border-gainsboro rounded-br-md rounded-bl-md'>

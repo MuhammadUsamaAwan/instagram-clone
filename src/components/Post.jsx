@@ -6,6 +6,7 @@ import { ReactComponent as Unlike } from '../assets/icons/liked.svg'
 import { ReactComponent as Comment } from '../assets/icons/commentpost.svg'
 import { ReactComponent as Share } from '../assets/icons/share.svg'
 import { ReactComponent as Saved } from '../assets/icons/savedpost.svg'
+import { ReactComponent as Dots } from '../assets/icons/dots.svg'
 import {
   getDoc,
   updateDoc,
@@ -16,6 +17,8 @@ import {
 import { auth, db } from '../config/firebase.config'
 import moment from 'moment'
 import Comments from './Comments'
+import Likes from './Likes'
+import PostActions from './PostActions'
 
 const Post = ({ openPostModal, setOpenPostModal, postId }) => {
   const navigate = useNavigate()
@@ -26,6 +29,8 @@ const Post = ({ openPostModal, setOpenPostModal, postId }) => {
   const [comment, setComment] = useState('')
   const [submitCommentLoading, setSubmitCommentLoading] = useState(false)
   const [submitCommentDisabled, setSubmitCommentDisabled] = useState(true)
+  const [openLikesModal, setOpenLikesModal] = useState(false)
+  const [openActionsModal, setOpenActionsModal] = useState(false)
 
   const getPost = async () => {
     let docRef = doc(db, 'posts', postId)
@@ -115,22 +120,41 @@ const Post = ({ openPostModal, setOpenPostModal, postId }) => {
         {/* post info */}
         <div className='w-1/2 sm:w-[35%] flex flex-col'>
           {/* user info */}
-          <div
-            className='flex items-center space-x-3 mb-2 px-4 pt-3.5 cursor-pointer'
-            onClick={() => {
-              setOpenPostModal(false)
-              navigate(`/users/${postData?.userRef}`)
-            }}
-          >
-            <div className='w-8 h-8 overflow-hidden rounded-full flex'>
-              <img src={userData?.photoURL} alt='profile' />
+          <div className='flex items-center justify-between space-x-3 mb-2 px-4 pt-3.5'>
+            <div
+              className='flex items-center space-x-3 cursor-pointer'
+              onClick={() => {
+                setOpenPostModal(false)
+                navigate(`/users/${postData?.userRef}`)
+              }}
+            >
+              <div className='w-8 h-8 overflow-hidden rounded-full flex'>
+                <img src={userData?.photoURL} alt='profile' />
+              </div>
+              <div className='font-semibold'>{userData?.userName}</div>
             </div>
-            <div className='font-semibold'>{userData?.userName}</div>
+            {postData?.userRef === auth.currentUser.uid && (
+              <button>
+                <Dots onClick={() => setOpenActionsModal(true)} />
+              </button>
+            )}
           </div>
           <p className='px-4 border-b border-gainsboro pb-3.5'>
             {postData?.caption}
           </p>
-          <Comments comments={postData?.comments} />
+          {/* actions modal */}
+          <PostActions
+            openActionsModal={openActionsModal}
+            setOpenActionsModal={setOpenActionsModal}
+            setOpenPostModal={setOpenPostModal}
+            postId={postId}
+          />
+          {/* comments */}
+          <Comments
+            comments={postData?.comments}
+            setOpenPostModal={setOpenPostModal}
+            postId={postId}
+          />
           {/* actions */}
           <div className='px-4 flex items-center justify-between py-3.5 border-t border-gainsboro'>
             <div className='flex items-center space-x-4'>
@@ -150,8 +174,16 @@ const Post = ({ openPostModal, setOpenPostModal, postId }) => {
           </div>
           {/* likes */}
           <div className='font-semibold px-4'>
-            {postData?.likes ? postData?.likes.length : 0} likes
+            <button onClick={() => setOpenLikesModal(true)}>
+              {postData?.likes ? postData?.likes.length : 0} likes
+            </button>
           </div>
+          {/* likes modal */}
+          <Likes
+            openLikesModal={openLikesModal}
+            setOpenLikesModal={setOpenLikesModal}
+            userIds={postData?.likes ? postData?.likes : []}
+          />
           {/* time */}
           <div className='px-4 uppercase text-[0.625rem] text-philippinegray pb-3.5 border-b border-gainsboro'>
             {moment(postData?.timestamp?.toDate()).fromNow()}
