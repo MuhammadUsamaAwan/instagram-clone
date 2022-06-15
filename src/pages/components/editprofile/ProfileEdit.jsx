@@ -86,9 +86,12 @@ const ProfileEdit = () => {
       {/* edit photo */}
       <div className='flex items-center justify-center mb-4'>
         <div className='flex flex-1 justify-end'>
-          <div className='rounded-full overflow-hidden flex items-center justify-center h-[2.625rem] w-[2.625rem]'>
-            <img src={profilePhoto} alt='avatar' loading='lazy' />
-          </div>
+          <img
+            src={profilePhoto}
+            alt='avatar'
+            loading='lazy'
+            className='h-[2.625rem] w-[2.625rem] rounded-full object-cover'
+          />
         </div>
         <div className='flex-[4] ml-8'>
           <h1 className='text-[1.25rem] mb-0.5'>

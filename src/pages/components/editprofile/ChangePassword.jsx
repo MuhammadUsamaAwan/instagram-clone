@@ -45,9 +45,12 @@ const ChangePassword = () => {
       {/* photo */}
       <div className='flex items-center justify-center mb-4'>
         <div className='flex flex-1 justify-end'>
-          <div className='rounded-full overflow-hidden flex items-center justify-center h-[2.625rem] w-[2.625rem]'>
-            <img src={auth.currentUser.photoURL} alt='avatar' loading='lazy' />
-          </div>
+          <img
+            src={auth.currentUser.photoURL}
+            alt='avatar'
+            loading='lazy'
+            className='h-[2.625rem] w-[2.625rem] rounded-full object-cover'
+          />
         </div>
         <div className='flex-[4] ml-8'>
           <h1 className='text-2xl mb-0.5'>{auth.currentUser.displayName}</h1>

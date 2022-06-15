@@ -128,9 +128,11 @@ const Post = ({ openPostModal, setOpenPostModal, postId }) => {
                 navigate(`/users/${postData?.userRef}`)
               }}
             >
-              <div className='w-8 h-8 overflow-hidden rounded-full flex'>
-                <img src={userData?.photoURL} alt='profile' />
-              </div>
+              <img
+                src={userData?.photoURL}
+                alt='profile'
+                className='w-8 h-8 object-cover rounded-full'
+              />
               <div className='font-semibold'>{userData?.userName}</div>
             </div>
             {postData?.userRef === auth.currentUser.uid && (

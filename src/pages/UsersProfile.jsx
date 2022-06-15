@@ -93,9 +93,12 @@ const UserProfile = () => {
         {/* profile header */}
         <div className='flex items-center'>
           <div className='flex-1'>
-            <div className='h-[4.6875rem] sm:h-[9.375rem] w-[4.6875rem] sm:w-[9.375rem] rounded-full overflow-hidden flex ml-0 sm:ml-14'>
-              <img src={user.photoURL} alt='avatar' loading='lazy' />
-            </div>
+            <img
+              src={user.photoURL}
+              alt='avatar'
+              loading='lazy'
+              className='h-[4.6875rem] sm:h-[9.375rem] w-[4.6875rem] sm:w-[9.375rem] rounded-full object-cover ml-0 sm:ml-14'
+            />
           </div>
 
           <div className='flex-[2] space-y-4'>

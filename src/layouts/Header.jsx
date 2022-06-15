@@ -137,9 +137,11 @@ const Header = () => {
                       className='px-2 py-2 flex items-center text-sm hover:bg-lotion'
                       key={result.id}
                     >
-                      <div className='w-11 h-11 overflow-hidden rounded-full flex'>
-                        <img src={result.data.photoURL} alt='profile' />
-                      </div>
+                      <img
+                        src={result.data.photoURL}
+                        alt='profile'
+                        className='w-11 h-11 object-cover rounded-full'
+                      />
                       <div className='ml-4 leading-[1.125rem]'>
                         <div className='font-semibold'>
                           {result.data.userName}
@@ -186,9 +188,11 @@ const Header = () => {
             } border p-[1px] rounded-full cursor-pointer relative`}
             onClick={handleProfileClick}
           >
-            <div className='w-6 h-6 overflow-hidden rounded-full flex'>
-              <img src={auth.currentUser.photoURL} alt='profile' />
-            </div>
+            <img
+              src={auth.currentUser.photoURL}
+              alt='profile'
+              className='w-6 h-6 rounded-full object-cover'
+            />
             {activeLink === 'profile' && (
               <>
                 <div className='absolute h-5 w-5 bg-white -rotate-45 right-[0.2rem] top-[2.2rem] shadow-[0_0_5px_1px_rgba(0,0,0,0.0975)]'></div>

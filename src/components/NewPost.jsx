@@ -145,9 +145,11 @@ const NewPost = ({ openPostModal, setOpenPostModal }) => {
             <div>
               <div className='absolute top-4 left-0 px-4 w-full'>
                 <div className='flex items-center space-x-3 mb-2'>
-                  <div className='w-[1.75rem] h-[1.75rem] overflow-hidden rounded-full flex'>
-                    <img src={auth.currentUser.photoURL} alt='profile' />
-                  </div>
+                  <img
+                    src={auth.currentUser.photoURL}
+                    alt='profile'
+                    className='w-[1.75rem] h-[1.75rem] rounded-full object-cover'
+                  />
                   <div className='text-base font-semibold'>
                     {auth.currentUser.displayName}
                   </div>

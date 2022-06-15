@@ -67,7 +67,7 @@ const Home = () => {
             <img
               src={auth.currentUser.photoURL}
               alt='avatar'
-              className='rounded-full object-cover h-[3.5rem] 2-[3.5rem]'
+              className='rounded-full object-cover h-[3.5rem] w-[3.5rem]'
             />
             <div>
               <div className='font-semibold'>
